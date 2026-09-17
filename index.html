@@ -48,10 +48,10 @@
     position: absolute; left: 0; right: 0; bottom: 0; height: 6px;
     background: linear-gradient(90deg, var(--bleu) 0 33.3%, #fff 33.3% 66.6%, var(--rouge) 66.6% 100%);
   }
-  header h1 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -.3px; }
-  header p { margin: 4px 0 0; opacity: .85; font-size: 14px; }
+  header h1 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -.3px; text-align: center; }
+  header p { margin: 6px auto 0; opacity: .85; font-size: 14px; text-align: center; max-width: 30em; }
   .resume {
-    display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;
+    display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; justify-content: center;
   }
   .pill {
     background: rgba(255,255,255,.14);
@@ -332,12 +332,20 @@
     ].map((p, i) => ({ id: 'ex' + i + '-' + Date.now(), ...p }));
   }
 
-  let produits = charger();
+  let produits = [];
   function charger() {
-    try { const s = localStorage.getItem(CLE); if (s) return JSON.parse(s); } catch (e) {}
-    const ex = exemples(); sauver(ex); return ex;
+    try {
+      const s = localStorage.getItem(CLE);
+      if (s) { const d = JSON.parse(s); if (Array.isArray(d) && d.length) return d; }
+    } catch (e) {}
+    return exemples();
   }
-  function sauver(p) { produits = p || produits; try { localStorage.setItem(CLE, JSON.stringify(produits)); } catch (e) {} }
+  function sauver(p) {
+    if (p) produits = p;
+    try { localStorage.setItem(CLE, JSON.stringify(produits)); } catch (e) {}
+  }
+  produits = charger();
+  sauver();
 
   // ---------- Statut ----------
   function joursRestants(date) {
