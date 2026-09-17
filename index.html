@@ -50,15 +50,6 @@
   }
   header h1 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -.3px; text-align: center; }
   header p { margin: 6px auto 0; opacity: .85; font-size: 14px; text-align: center; max-width: 30em; }
-  .resume {
-    display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; justify-content: center;
-  }
-  .pill {
-    background: rgba(255,255,255,.14);
-    border-radius: 999px; padding: 5px 11px; font-size: 13px; font-weight: 600;
-  }
-  .pill.alerte { background: var(--rouge); }
-  .pill.bientot { background: var(--orange); }
 
   /* ---------- Liste ---------- */
   main { padding: 14px 14px 0; max-width: 680px; margin: 0 auto; }
@@ -86,10 +77,19 @@
   .produit .infos { flex: 1; min-width: 0; }
   .produit .nom { font-weight: 700; font-size: 16px; }
   .produit .detail { font-size: 13px; color: var(--gris); margin-top: 2px; }
-  .produit .qte {
-    font-size: 22px; font-weight: 800; min-width: 54px; text-align: right; color: var(--bleu);
+  .produit .stock { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .produit .stock .pas {
+    width: 40px; height: 40px; border-radius: 12px; border: none; font-size: 22px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center; line-height: 1;
   }
-  .produit .qte small { font-size: 12px; font-weight: 600; color: var(--gris); display: block; }
+  .produit .stock .moins { background: var(--gris-clair); color: var(--texte); }
+  .produit .stock .moins:disabled { opacity: .35; }
+  .produit .stock .plus { background: var(--bleu); color: #fff; }
+  .produit .stock .pas:active { filter: brightness(.9); }
+  .produit .qte {
+    font-size: 22px; font-weight: 800; min-width: 46px; text-align: center; color: var(--bleu);
+  }
+  .produit .qte small { font-size: 11px; font-weight: 600; color: var(--gris); display: block; }
   .produit.epuise .qte { color: var(--rouge); }
   .badge {
     display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
@@ -204,7 +204,6 @@
 <header>
   <h1>La Malle de Dorine</h1>
   <p>Provisions de l'équipe — ce qu'il reste, ce qui périme, ce qui manque</p>
-  <div class="resume" id="resume"></div>
 </header>
 
 <main>
@@ -373,18 +372,23 @@
 
   // ---------- Rendu liste principale ----------
   const $ = (id) => document.getElementById(id);
+
+  // Met à jour une ligne sur place, sans re-trier la liste sous le doigt
+  function majLigne(el, p) {
+    const s = statut(p);
+    el.className = 'produit ' + s;
+    el.querySelector('.n').textContent = p.qte;
+    el.querySelector('.detail').textContent = p.date ? 'Périme le ' + dateFr(p.date) : 'Sans date';
+    const b = el.querySelector('.badge');
+    b.className = 'badge ' + s;
+    b.textContent = libelle(p);
+    b.style.display = s === 'ok' ? 'none' : '';
+    el.querySelector('.moins').disabled = p.qte <= 0;
+  }
+
   function rendu() {
     const q = $('recherche').value.trim().toLowerCase();
     const liste = $('liste'); liste.innerHTML = '';
-    let n = { perime: 0, bientot: 0, epuise: 0, bas: 0 };
-    produits.forEach(p => { const s = statut(p); if (n[s] !== undefined) n[s]++; });
-    $('resume').innerHTML =
-      '<span class="pill">' + produits.length + ' produits</span>' +
-      (n.perime ? '<span class="pill alerte">' + n.perime + ' périmé' + (n.perime > 1 ? 's' : '') + '</span>' : '') +
-      (n.epuise ? '<span class="pill alerte">' + n.epuise + ' épuisé' + (n.epuise > 1 ? 's' : '') + '</span>' : '') +
-      (n.bientot ? '<span class="pill bientot">' + n.bientot + ' à finir vite</span>' : '') +
-      (n.bas ? '<span class="pill bientot">' + n.bas + ' stock bas</span>' : '');
-
     const filtres = produits.filter(p => !q || p.nom.toLowerCase().includes(q));
     if (!filtres.length) { liste.innerHTML = '<div class="vide">Aucun produit.</div>'; return; }
     const ordre = { perime: 0, epuise: 1, bientot: 2, bas: 3, ok: 4 };
@@ -394,15 +398,27 @@
       if (!items.length) return;
       const h = document.createElement('div'); h.className = 'categorie'; h.textContent = cat; liste.appendChild(h);
       items.forEach(p => {
-        const s = statut(p); const el = document.createElement('div');
-        el.className = 'produit ' + s;
+        const el = document.createElement('div');
         el.innerHTML =
-          '<div class="infos"><div class="nom"></div><div class="detail">' + (p.date ? 'Périme le ' + dateFr(p.date) : 'Sans date') + '</div>' +
-          (s !== 'ok' ? '<span class="badge ' + s + '">' + libelle(p) + '</span>' : '') + '</div>' +
-          '<div class="qte">' + p.qte + '<small></small></div>';
+          '<div class="infos"><div class="nom"></div><div class="detail"></div><span class="badge"></span></div>' +
+          '<div class="stock">' +
+            '<button class="pas moins" aria-label="Retirer une unité">−</button>' +
+            '<div class="qte"><span class="n"></span><small></small></div>' +
+            '<button class="pas plus" aria-label="Ajouter une unité">+</button>' +
+          '</div>';
         el.querySelector('.nom').textContent = p.nom;
         el.querySelector('small').textContent = p.unite || '';
-        el.addEventListener('click', () => ouvrirEdit(p.id));
+        majLigne(el, p);
+        el.querySelector('.infos').addEventListener('click', () => ouvrirEdit(p.id));
+        el.querySelector('.moins').addEventListener('click', e => {
+          e.stopPropagation();
+          if (p.qte <= 0) return;
+          p.qte -= 1; sauver(); majLigne(el, p);
+        });
+        el.querySelector('.plus').addEventListener('click', e => {
+          e.stopPropagation();
+          p.qte += 1; sauver(); majLigne(el, p);
+        });
         liste.appendChild(el);
       });
     });
