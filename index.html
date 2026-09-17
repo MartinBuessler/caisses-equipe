@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b2a5b">
+<title>La Malle de Dorine</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230b2a5b'/%3E%3Crect x='12' y='24' width='40' height='26' rx='4' fill='%23fff'/%3E%3Crect x='12' y='18' width='40' height='10' rx='3' fill='%23d62828'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bleu: #0b2a5b;
+    --bleu-clair: #e8eef8;
+    --rouge: #d62828;
+    --rouge-clair: #fbe5e5;
+    --orange: #e07a00;
+    --orange-clair: #fdf0dc;
+    --vert: #1f8a4c;
+    --vert-clair: #e3f4ea;
+    --gris: #6b7280;
+    --gris-clair: #f3f4f6;
+    --fond: #f7f8fb;
+    --carte: #ffffff;
+    --texte: #111827;
+    --ombre: 0 1px 3px rgba(0,0,0,.08), 0 4px 14px rgba(11,42,91,.06);
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--fond);
+    color: var(--texte);
+    -webkit-tap-highlight-color: transparent;
+    padding-bottom: calc(120px + env(safe-area-inset-bottom));
+  }
+  button { font-family: inherit; cursor: pointer; }
+
+  /* ---------- En-tête tricolore ---------- */
+  header {
+    background: var(--bleu);
+    color: #fff;
+    padding: calc(18px + env(safe-area-inset-top)) 18px 16px;
+    position: relative;
+  }
+  header::after {
+    content: "";
+    display: block;
+    position: absolute; left: 0; right: 0; bottom: 0; height: 6px;
+    background: linear-gradient(90deg, var(--bleu) 0 33.3%, #fff 33.3% 66.6%, var(--rouge) 66.6% 100%);
+  }
+  header h1 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -.3px; }
+  header p { margin: 4px 0 0; opacity: .85; font-size: 14px; }
+  .resume {
+    display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;
+  }
+  .pill {
+    background: rgba(255,255,255,.14);
+    border-radius: 999px; padding: 5px 11px; font-size: 13px; font-weight: 600;
+  }
+  .pill.alerte { background: var(--rouge); }
+  .pill.bientot { background: var(--orange); }
+
+  /* ---------- Liste ---------- */
+  main { padding: 14px 14px 0; max-width: 680px; margin: 0 auto; }
+  .recherche {
+    width: 100%; padding: 12px 14px; border: 1px solid #d9dee8; border-radius: var(--radius);
+    font-size: 16px; background: #fff; margin-bottom: 8px; outline: none;
+  }
+  .recherche:focus { border-color: var(--bleu); }
+  .categorie {
+    margin: 18px 0 8px; font-size: 12px; font-weight: 800; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--gris);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .categorie::after { content: ""; flex: 1; height: 1px; background: #e2e6ee; }
+  .produit {
+    background: var(--carte); border-radius: var(--radius); box-shadow: var(--ombre);
+    padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px;
+    border-left: 5px solid transparent; cursor: pointer; user-select: none;
+  }
+  .produit:active { transform: scale(.99); }
+  .produit.ok { border-left-color: var(--vert); }
+  .produit.bientot { border-left-color: var(--orange); }
+  .produit.perime, .produit.epuise { border-left-color: var(--rouge); }
+  .produit.bas { border-left-color: var(--orange); }
+  .produit .infos { flex: 1; min-width: 0; }
+  .produit .nom { font-weight: 700; font-size: 16px; }
+  .produit .detail { font-size: 13px; color: var(--gris); margin-top: 2px; }
+  .produit .qte {
+    font-size: 22px; font-weight: 800; min-width: 54px; text-align: right; color: var(--bleu);
+  }
+  .produit .qte small { font-size: 12px; font-weight: 600; color: var(--gris); display: block; }
+  .produit.epuise .qte { color: var(--rouge); }
+  .badge {
+    display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+    margin-top: 4px; margin-right: 4px;
+  }
+  .badge.perime { background: var(--rouge-clair); color: var(--rouge); }
+  .badge.bientot { background: var(--orange-clair); color: var(--orange); }
+  .badge.epuise { background: var(--rouge-clair); color: var(--rouge); }
+  .badge.bas { background: var(--orange-clair); color: var(--orange); }
+  .vide { text-align: center; color: var(--gris); padding: 40px 10px; }
+
+  .pied { text-align: center; padding: 30px 0 10px; }
+  .pied button {
+    background: none; border: 1px solid #d9dee8; color: var(--gris); border-radius: 999px;
+    padding: 8px 16px; font-size: 13px;
+  }
+  .pied p { font-size: 12px; color: #9aa3b2; margin: 10px 0 0; }
+
+  /* ---------- Barre d'action fixe ---------- */
+  .actions {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+    display: flex; gap: 10px; padding: 10px 12px calc(12px + env(safe-area-inset-bottom));
+    background: rgba(247,248,251,.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid #e2e6ee;
+  }
+  .actions button {
+    flex: 1; border: none; border-radius: 16px; padding: 18px 10px; font-size: 17px; font-weight: 800;
+    color: #fff; box-shadow: 0 4px 14px rgba(0,0,0,.15); display: flex; flex-direction: column;
+    align-items: center; gap: 4px; line-height: 1.1;
+  }
+  .actions button span { font-size: 26px; font-weight: 900; }
+  .actions .prendre { background: var(--rouge); }
+  .actions .ajouter { background: var(--bleu); }
+  .actions button:active { filter: brightness(.9); }
+
+  /* ---------- Feuilles (sheets) ---------- */
+  .voile {
+    position: fixed; inset: 0; background: rgba(11,42,91,.45); z-index: 30; display: none;
+  }
+  .voile.ouvert { display: block; }
+  .feuille {
+    position: fixed; left: 0; right: 0; bottom: 0; top: 40px; z-index: 40; background: var(--fond);
+    border-radius: 22px 22px 0 0; display: none; flex-direction: column; overflow: hidden;
+    max-width: 720px; margin: 0 auto; box-shadow: 0 -8px 30px rgba(0,0,0,.2);
+  }
+  .feuille.ouvert { display: flex; }
+  .feuille-tete {
+    padding: 14px 16px 10px; background: var(--carte); border-bottom: 1px solid #e2e6ee;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .feuille-tete h2 { margin: 0; font-size: 20px; flex: 1; }
+  .feuille-tete .fermer {
+    background: var(--gris-clair); border: none; border-radius: 999px; width: 36px; height: 36px;
+    font-size: 20px; color: var(--gris);
+  }
+  .feuille-corps { flex: 1; overflow-y: auto; padding: 12px 14px 20px; -webkit-overflow-scrolling: touch; }
+  .recap {
+    background: var(--carte); border: 1px dashed #c8d0de; border-radius: var(--radius);
+    padding: 10px 14px; font-size: 14px; margin-bottom: 12px; min-height: 42px; color: var(--gris);
+  }
+  .recap.actif { color: var(--texte); border-style: solid; border-color: var(--bleu); background: var(--bleu-clair); }
+  .recap b { color: var(--bleu); }
+  .ligne {
+    background: var(--carte); border-radius: var(--radius); box-shadow: var(--ombre);
+    padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px;
+  }
+  .ligne .infos { flex: 1; min-width: 0; }
+  .ligne .nom { font-weight: 700; }
+  .ligne .detail { font-size: 12px; color: var(--gris); }
+  .ligne .compteur { display: flex; align-items: center; gap: 6px; }
+  .ligne .compteur button {
+    width: 44px; height: 44px; border-radius: 12px; border: none; font-size: 22px; font-weight: 800; color: #fff;
+  }
+  .ligne .compteur .moins { background: var(--gris-clair); color: var(--gris); }
+  .ligne .compteur .plus { background: var(--bleu); }
+  .feuille.prendre .ligne .compteur .plus { background: var(--rouge); }
+  .ligne .compteur .n { min-width: 28px; text-align: center; font-weight: 800; font-size: 18px; }
+  .ligne.desactive { opacity: .45; }
+  .feuille-pied {
+    padding: 10px 14px calc(12px + env(safe-area-inset-bottom)); background: var(--carte);
+    border-top: 1px solid #e2e6ee; display: flex; gap: 10px;
+  }
+  .btn {
+    flex: 1; border: none; border-radius: 14px; padding: 15px; font-size: 16px; font-weight: 800; color: #fff;
+  }
+  .btn.bleu { background: var(--bleu); }
+  .btn.rouge { background: var(--rouge); }
+  .btn.gris { background: var(--gris-clair); color: var(--texte); }
+  .btn.contour { background: none; border: 2px solid var(--bleu); color: var(--bleu); }
+  .btn:disabled { opacity: .45; }
+
+  /* ---------- Formulaire ---------- */
+  .form label { display: block; font-size: 13px; font-weight: 700; color: var(--gris); margin: 12px 0 4px; }
+  .form input, .form select {
+    width: 100%; padding: 12px; border: 1px solid #d9dee8; border-radius: 12px; font-size: 16px; background: #fff;
+  }
+  .form .deux { display: flex; gap: 10px; }
+  .form .deux > div { flex: 1; }
+  .danger { margin-top: 24px; text-align: center; }
+  .danger button { background: none; border: none; color: var(--rouge); font-weight: 700; font-size: 14px; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: calc(110px + env(safe-area-inset-bottom)); transform: translateX(-50%);
+    background: var(--texte); color: #fff; padding: 10px 16px; border-radius: 999px; font-size: 14px;
+    z-index: 60; opacity: 0; transition: opacity .2s; pointer-events: none; max-width: 90vw; text-align: center;
+  }
+  .toast.visible { opacity: 1; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>La Malle de Dorine</h1>
+  <p>Provisions de l'équipe — ce qu'il reste, ce qui périme, ce qui manque</p>
+  <div class="resume" id="resume"></div>
+</header>
+
+<main>
+  <input class="recherche" id="recherche" type="search" placeholder="Rechercher un produit…" autocomplete="off">
+  <div id="liste"></div>
+  <div class="pied">
+    <button id="btnReset">Remettre les provisions d'exemple</button>
+    <p>Touche un produit pour le modifier (quantité, date, seuil).</p>
+  </div>
+</main>
+
+<div class="actions">
+  <button class="prendre" id="btnPrendre"><span>−</span>Prendre dans la boîte</button>
+  <button class="ajouter" id="btnAjouter"><span>+</span>Ajouter dans la boîte</button>
+</div>
+
+<div class="voile" id="voile"></div>
+
+<!-- Feuille Prendre / Ajouter -->
+<section class="feuille" id="feuilleMouv">
+  <div class="feuille-tete">
+    <h2 id="mouvTitre">Prendre dans la boîte</h2>
+    <button class="fermer" data-fermer>×</button>
+  </div>
+  <div class="feuille-corps">
+    <div class="recap" id="mouvRecap">Touche un produit à chaque unité sortie.</div>
+    <input class="recherche" id="mouvRecherche" type="search" placeholder="Filtrer…" autocomplete="off">
+    <div id="mouvListe"></div>
+  </div>
+  <div class="feuille-pied">
+    <button class="btn contour" id="mouvNouveau" style="display:none">+ Nouveau produit</button>
+    <button class="btn bleu" id="mouvValider" disabled>Valider</button>
+  </div>
+</section>
+
+<!-- Feuille Édition / Création -->
+<section class="feuille" id="feuilleEdit">
+  <div class="feuille-tete">
+    <h2 id="editTitre">Produit</h2>
+    <button class="fermer" data-fermer>×</button>
+  </div>
+  <div class="feuille-corps form">
+    <label>Nom</label>
+    <input id="fNom" type="text" placeholder="Ex. Barres céréales">
+    <label>Catégorie</label>
+    <select id="fCat"></select>
+    <div class="deux">
+      <div><label>Quantité</label><input id="fQte" type="number" min="0" inputmode="numeric"></div>
+      <div><label>Unité</label><input id="fUnite" type="text" placeholder="pièces, sachets…"></div>
+    </div>
+    <div class="deux">
+      <div><label>Date de péremption</label><input id="fDate" type="date"></div>
+      <div><label>Alerte si moins de</label><input id="fMin" type="number" min="0" inputmode="numeric"></div>
+    </div>
+    <div class="danger"><button id="fSupprimer">Supprimer ce produit</button></div>
+  </div>
+  <div class="feuille-pied">
+    <button class="btn gris" data-fermer>Annuler</button>
+    <button class="btn bleu" id="fEnregistrer">Enregistrer</button>
+  </div>
+</section>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+  const CLE = 'malle-dorine-v1';
+  const CATEGORIES = ['Barres & gels', 'Compotes & fruits', 'Boissons', 'Repas', 'Compléments', 'Divers'];
+
+  const j = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
+
+  function exemples() {
+    return [
+      { nom: 'Barres céréales', cat: 'Barres & gels', qte: 18, unite: 'barres', date: j(120), min: 6 },
+      { nom: 'Barres protéinées', cat: 'Barres & gels', qte: 9, unite: 'barres', date: j(90), min: 4 },
+      { nom: 'Gels énergétiques', cat: 'Barres & gels', qte: 14, unite: 'gels', date: j(200), min: 6 },
+      { nom: 'Gels caféinés', cat: 'Barres & gels', qte: 5, unite: 'gels', date: j(180), min: 3 },
+      { nom: 'Pâtes de fruits', cat: 'Barres & gels', qte: 12, unite: 'pièces', date: j(60), min: 4 },
+      { nom: 'Compotes à boire', cat: 'Compotes & fruits', qte: 7, unite: 'gourdes', date: j(3), min: 4 },
+      { nom: 'Bananes', cat: 'Compotes & fruits', qte: 4, unite: 'pièces', date: j(2), min: 3 },
+      { nom: 'Fruits secs (mélange)', cat: 'Compotes & fruits', qte: 3, unite: 'sachets', date: j(150), min: 2 },
+      { nom: 'Amandes', cat: 'Compotes & fruits', qte: 2, unite: 'sachets', date: j(140), min: 1 },
+      { nom: 'Boisson isotonique (poudre)', cat: 'Boissons', qte: 2, unite: 'pots', date: j(300), min: 1 },
+      { nom: 'Sels de réhydratation', cat: 'Boissons', qte: 0, unite: 'sachets', date: j(400), min: 5 },
+      { nom: 'Lait d\'amande', cat: 'Boissons', qte: 2, unite: 'briques', date: j(-4), min: 1 },
+      { nom: 'Thé & infusions', cat: 'Boissons', qte: 30, unite: 'sachets', date: j(500), min: 10 },
+      { nom: 'Café soluble', cat: 'Boissons', qte: 1, unite: 'pot', date: j(365), min: 1 },
+      { nom: 'Thon en boîte', cat: 'Repas', qte: 6, unite: 'boîtes', date: j(700), min: 3 },
+      { nom: 'Riz (sachets cuisson rapide)', cat: 'Repas', qte: 8, unite: 'sachets', date: j(600), min: 3 },
+      { nom: 'Pâtes', cat: 'Repas', qte: 3, unite: 'paquets', date: j(600), min: 1 },
+      { nom: 'Soupe déshydratée', cat: 'Repas', qte: 10, unite: 'sachets', date: j(250), min: 4 },
+      { nom: 'Galettes de riz', cat: 'Repas', qte: 2, unite: 'paquets', date: j(80), min: 1 },
+      { nom: 'Magnésium', cat: 'Compléments', qte: 40, unite: 'comprimés', date: j(400), min: 10 },
+      { nom: 'Vitamine C', cat: 'Compléments', qte: 25, unite: 'comprimés', date: j(300), min: 10 },
+      { nom: 'Protéine en poudre', cat: 'Compléments', qte: 1, unite: 'pot', date: j(200), min: 1 },
+      { nom: 'Couverts & gobelets', cat: 'Divers', qte: 20, unite: 'pièces', date: '', min: 6 }
+    ].map((p, i) => ({ id: 'ex' + i + '-' + Date.now(), ...p }));
+  }
+
+  let produits = charger();
+  function charger() {
+    try { const s = localStorage.getItem(CLE); if (s) return JSON.parse(s); } catch (e) {}
+    const ex = exemples(); sauver(ex); return ex;
+  }
+  function sauver(p) { produits = p || produits; try { localStorage.setItem(CLE, JSON.stringify(produits)); } catch (e) {} }
+
+  // ---------- Statut ----------
+  function joursRestants(date) {
+    if (!date) return null;
+    const d = new Date(date + 'T00:00:00'); const auj = new Date(); auj.setHours(0, 0, 0, 0);
+    return Math.round((d - auj) / 86400000);
+  }
+  function statut(p) {
+    const jr = joursRestants(p.date);
+    if (p.qte <= 0) return 'epuise';
+    if (jr !== null && jr < 0) return 'perime';
+    if (jr !== null && jr <= 7) return 'bientot';
+    if (p.min > 0 && p.qte <= p.min) return 'bas';
+    return 'ok';
+  }
+  function libelle(p) {
+    const s = statut(p); const jr = joursRestants(p.date);
+    if (s === 'epuise') return 'Épuisé';
+    if (s === 'perime') return 'Périmé depuis ' + Math.abs(jr) + ' j';
+    if (s === 'bientot') return jr === 0 ? 'À finir aujourd\'hui' : 'À finir sous ' + jr + ' j';
+    if (s === 'bas') return 'Stock bas';
+    return '';
+  }
+  function dateFr(d) { if (!d) return 'sans date'; const [a, m, jj] = d.split('-'); return jj + '/' + m + '/' + a; }
+
+  // ---------- Rendu liste principale ----------
+  const $ = (id) => document.getElementById(id);
+  function rendu() {
+    const q = $('recherche').value.trim().toLowerCase();
+    const liste = $('liste'); liste.innerHTML = '';
+    let n = { perime: 0, bientot: 0, epuise: 0, bas: 0 };
+    produits.forEach(p => { const s = statut(p); if (n[s] !== undefined) n[s]++; });
+    $('resume').innerHTML =
+      '<span class="pill">' + produits.length + ' produits</span>' +
+      (n.perime ? '<span class="pill alerte">' + n.perime + ' périmé' + (n.perime > 1 ? 's' : '') + '</span>' : '') +
+      (n.epuise ? '<span class="pill alerte">' + n.epuise + ' épuisé' + (n.epuise > 1 ? 's' : '') + '</span>' : '') +
+      (n.bientot ? '<span class="pill bientot">' + n.bientot + ' à finir vite</span>' : '') +
+      (n.bas ? '<span class="pill bientot">' + n.bas + ' stock bas</span>' : '');
+
+    const filtres = produits.filter(p => !q || p.nom.toLowerCase().includes(q));
+    if (!filtres.length) { liste.innerHTML = '<div class="vide">Aucun produit.</div>'; return; }
+    const ordre = { perime: 0, epuise: 1, bientot: 2, bas: 3, ok: 4 };
+    CATEGORIES.concat(['Autre']).forEach(cat => {
+      const items = filtres.filter(p => (CATEGORIES.includes(p.cat) ? p.cat : 'Autre') === cat)
+        .sort((a, b) => ordre[statut(a)] - ordre[statut(b)] || a.nom.localeCompare(b.nom, 'fr'));
+      if (!items.length) return;
+      const h = document.createElement('div'); h.className = 'categorie'; h.textContent = cat; liste.appendChild(h);
+      items.forEach(p => {
+        const s = statut(p); const el = document.createElement('div');
+        el.className = 'produit ' + s;
+        el.innerHTML =
+          '<div class="infos"><div class="nom"></div><div class="detail">' + (p.date ? 'Périme le ' + dateFr(p.date) : 'Sans date') + '</div>' +
+          (s !== 'ok' ? '<span class="badge ' + s + '">' + libelle(p) + '</span>' : '') + '</div>' +
+          '<div class="qte">' + p.qte + '<small></small></div>';
+        el.querySelector('.nom').textContent = p.nom;
+        el.querySelector('small').textContent = p.unite || '';
+        el.addEventListener('click', () => ouvrirEdit(p.id));
+        liste.appendChild(el);
+      });
+    });
+  }
+  $('recherche').addEventListener('input', rendu);
+
+  // ---------- Feuilles ----------
+  function ouvrir(id) { $('voile').classList.add('ouvert'); $(id).classList.add('ouvert'); document.body.style.overflow = 'hidden'; }
+  function fermerTout() {
+    $('voile').classList.remove('ouvert');
+    document.querySelectorAll('.feuille').forEach(f => f.classList.remove('ouvert'));
+    document.body.style.overflow = '';
+  }
+  document.querySelectorAll('[data-fermer]').forEach(b => b.addEventListener('click', fermerTout));
+  $('voile').addEventListener('click', fermerTout);
+
+  // ---------- Mouvement (prendre / ajouter) ----------
+  let mode = 'prendre', panier = {};
+  function ouvrirMouv(m) {
+    mode = m; panier = {};
+    $('mouvTitre').textContent = m === 'prendre' ? 'Prendre dans la boîte' : 'Ajouter dans la boîte';
+    $('feuilleMouv').classList.toggle('prendre', m === 'prendre');
+    $('mouvValider').className = 'btn ' + (m === 'prendre' ? 'rouge' : 'bleu');
+    $('mouvNouveau').style.display = m === 'ajouter' ? '' : 'none';
+    $('mouvRecherche').value = '';
+    renduMouv(); ouvrir('feuilleMouv');
+  }
+  function renduMouv() {
+    const q = $('mouvRecherche').value.trim().toLowerCase();
+    const cont = $('mouvListe'); cont.innerHTML = '';
+    const total = Object.values(panier).reduce((a, b) => a + b, 0);
+    const recap = $('mouvRecap');
+    if (total) {
+      const parts = Object.entries(panier).filter(([, n]) => n > 0).map(([id, n]) => {
+        const p = produits.find(x => x.id === id); return '<b>' + n + ' ×</b> ' + echap(p.nom);
+      });
+      recap.innerHTML = (mode === 'prendre' ? 'Pris : ' : 'Ajouté : ') + parts.join(', ');
+      recap.classList.add('actif');
+    } else {
+      recap.textContent = mode === 'prendre' ? 'Touche un produit à chaque unité sortie.' : 'Touche un produit à chaque unité rangée.';
+      recap.classList.remove('actif');
+    }
+    $('mouvValider').disabled = !total;
+    $('mouvValider').textContent = total ? 'Valider (' + total + ')' : 'Valider';
+
+    produits.slice().sort((a, b) => a.nom.localeCompare(b.nom, 'fr'))
+      .filter(p => !q || p.nom.toLowerCase().includes(q))
+      .forEach(p => {
+        const n = panier[p.id] || 0;
+        const restant = mode === 'prendre' ? p.qte - n : p.qte + n;
+        const bloque = mode === 'prendre' && p.qte - n <= 0;
+        const el = document.createElement('div'); el.className = 'ligne' + (bloque && !n ? ' desactive' : '');
+        el.innerHTML =
+          '<div class="infos"><div class="nom"></div><div class="detail">En stock : ' + p.qte + ' → ' + restant + ' ' + echap(p.unite || '') + '</div></div>' +
+          '<div class="compteur"><button class="moins" aria-label="moins">−</button><span class="n">' + n + '</span><button class="plus" aria-label="plus">+</button></div>';
+        el.querySelector('.nom').textContent = p.nom;
+        const plus = () => { if (mode === 'prendre' && p.qte - n <= 0) { toast('Plus de ' + p.nom + ' dans la boîte'); return; } panier[p.id] = n + 1; renduMouv(); };
+        el.querySelector('.plus').addEventListener('click', e => { e.stopPropagation(); plus(); });
+        el.querySelector('.moins').addEventListener('click', e => { e.stopPropagation(); if (n > 0) { panier[p.id] = n - 1; renduMouv(); } });
+        el.querySelector('.infos').addEventListener('click', plus);
+        cont.appendChild(el);
+      });
+    if (!cont.children.length) cont.innerHTML = '<div class="vide">Aucun produit.' + (mode === 'ajouter' ? '<br>Crée-le avec « Nouveau produit ».' : '') + '</div>';
+  }
+  $('mouvRecherche').addEventListener('input', renduMouv);
+  $('mouvValider').addEventListener('click', () => {
+    let resume = [];
+    Object.entries(panier).forEach(([id, n]) => {
+      if (!n) return; const p = produits.find(x => x.id === id); if (!p) return;
+      p.qte = Math.max(0, p.qte + (mode === 'prendre' ? -n : n)); resume.push(n + ' × ' + p.nom);
+    });
+    sauver(); fermerTout(); rendu();
+    toast((mode === 'prendre' ? 'Pris : ' : 'Ajouté : ') + resume.join(', '));
+  });
+  $('mouvNouveau').addEventListener('click', () => ouvrirEdit(null, true));
+  $('btnPrendre').addEventListener('click', () => ouvrirMouv('prendre'));
+  $('btnAjouter').addEventListener('click', () => ouvrirMouv('ajouter'));
+
+  // ---------- Édition / création ----------
+  let editId = null, retourMouv = false;
+  $('fCat').innerHTML = CATEGORIES.map(c => '<option>' + c + '</option>').join('');
+  function ouvrirEdit(id, depuisMouv) {
+    editId = id; retourMouv = !!depuisMouv;
+    const p = id ? produits.find(x => x.id === id) : null;
+    $('editTitre').textContent = p ? 'Modifier le produit' : 'Nouveau produit';
+    $('fNom').value = p ? p.nom : '';
+    $('fCat').value = p ? p.cat : CATEGORIES[0];
+    $('fQte').value = p ? p.qte : 1;
+    $('fUnite').value = p ? (p.unite || '') : 'pièces';
+    $('fDate').value = p ? (p.date || '') : '';
+    $('fMin').value = p ? (p.min || 0) : 2;
+    $('fSupprimer').parentElement.style.display = p ? '' : 'none';
+    fermerTout(); ouvrir('feuilleEdit');
+    if (!p) setTimeout(() => $('fNom').focus(), 50);
+  }
+  $('fEnregistrer').addEventListener('click', () => {
+    const nom = $('fNom').value.trim(); if (!nom) { toast('Il faut un nom'); $('fNom').focus(); return; }
+    const data = { nom, cat: $('fCat').value, qte: Math.max(0, parseInt($('fQte').value, 10) || 0),
+      unite: $('fUnite').value.trim(), date: $('fDate').value, min: Math.max(0, parseInt($('fMin').value, 10) || 0) };
+    if (editId) { Object.assign(produits.find(x => x.id === editId), data); }
+    else { produits.push({ id: 'p' + Date.now(), ...data }); }
+    sauver(); fermerTout(); rendu();
+    toast(editId ? 'Produit enregistré' : nom + ' ajouté à la boîte');
+    if (retourMouv) ouvrirMouv('ajouter');
+  });
+  $('fSupprimer').addEventListener('click', () => {
+    const p = produits.find(x => x.id === editId);
+    if (p && confirm('Supprimer « ' + p.nom + ' » de la boîte ?')) {
+      produits = produits.filter(x => x.id !== editId); sauver(); fermerTout(); rendu(); toast('Produit supprimé');
+    }
+  });
+
+  $('btnReset').addEventListener('click', () => {
+    if (confirm('Remplacer tout le contenu actuel par les provisions d\'exemple ?')) { sauver(exemples()); rendu(); toast('Provisions d\'exemple remises'); }
+  });
+
+  // ---------- Utilitaires ----------
+  let toastTimer;
+  function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('visible'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('visible'), 2600); }
+  function echap(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+  rendu();
+})();
+</script>
+</body>
+</html>
