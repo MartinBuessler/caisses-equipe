@@ -48,6 +48,19 @@
     position: absolute; left: 0; right: 0; bottom: 0; height: 6px;
     background: linear-gradient(90deg, var(--bleu) 0 33.3%, #fff 33.3% 66.6%, var(--rouge) 66.6% 100%);
   }
+  .barre-haut {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px;
+  }
+  .puce {
+    background: rgba(255,255,255,.16); border: none; color: #fff; border-radius: 999px;
+    padding: 7px 13px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px;
+    max-width: 48vw; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  }
+  .puce:active { background: rgba(255,255,255,.28); }
+  .puce .rond {
+    width: 22px; height: 22px; border-radius: 50%; background: #fff; color: var(--bleu);
+    font-size: 11px; font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
   header h1 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -.3px; text-align: center; }
   header p { margin: 6px auto 0; opacity: .85; font-size: 14px; text-align: center; max-width: 30em; }
 
@@ -100,6 +113,39 @@
   .badge.epuise { background: var(--rouge-clair); color: var(--rouge); }
   .badge.bas { background: var(--orange-clair); color: var(--orange); }
   .vide { text-align: center; color: var(--gris); padding: 40px 10px; }
+
+  /* ---------- Historique ---------- */
+  .jour {
+    margin: 18px 0 8px; font-size: 12px; font-weight: 800; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--gris); display: flex; align-items: center; gap: 8px;
+  }
+  .jour::after { content: ""; flex: 1; height: 1px; background: #e2e6ee; }
+  .jour:first-child { margin-top: 0; }
+  .evt {
+    background: var(--carte); border-radius: var(--radius); box-shadow: var(--ombre);
+    padding: 11px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px;
+    border-left: 5px solid var(--gris-clair);
+  }
+  .evt.pris { border-left-color: var(--rouge); }
+  .evt.ajoute { border-left-color: var(--vert); }
+  .evt.cree { border-left-color: var(--bleu); }
+  .evt.supprime { border-left-color: var(--texte); }
+  .evt .qui {
+    width: 34px; height: 34px; border-radius: 50%; background: var(--bleu-clair); color: var(--bleu);
+    font-size: 13px; font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .evt .txt { flex: 1; min-width: 0; font-size: 14px; line-height: 1.35; }
+  .evt .txt b { font-weight: 800; }
+  .evt .txt .quand { display: block; font-size: 12px; color: var(--gris); margin-top: 2px; }
+  .evt .delta { font-size: 16px; font-weight: 800; flex-shrink: 0; }
+  .evt.pris .delta { color: var(--rouge); }
+  .evt.ajoute .delta { color: var(--vert); }
+  .filtres { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 10px; }
+  .filtres button {
+    border: 1px solid #d9dee8; background: #fff; color: var(--gris); border-radius: 999px;
+    padding: 7px 13px; font-size: 13px; font-weight: 700; white-space: nowrap;
+  }
+  .filtres button.actif { background: var(--bleu); border-color: var(--bleu); color: #fff; }
 
   .pied { text-align: center; padding: 30px 0 10px; }
   .pied button {
@@ -202,6 +248,10 @@
 <body>
 
 <header>
+  <div class="barre-haut">
+    <button class="puce" id="puceQui"><span class="rond" id="puceInit">?</span><span id="puceNom">Qui es-tu ?</span></button>
+    <button class="puce" id="puceHist">Historique</button>
+  </div>
   <h1>La Malle de Dorine</h1>
   <p>Provisions de l'équipe — ce qu'il reste, ce qui périme, ce qui manque</p>
 </header>
@@ -263,6 +313,40 @@
   <div class="feuille-pied">
     <button class="btn gris" data-fermer>Annuler</button>
     <button class="btn bleu" id="fEnregistrer">Enregistrer</button>
+  </div>
+</section>
+
+<!-- Feuille Historique -->
+<section class="feuille" id="feuilleHist">
+  <div class="feuille-tete">
+    <h2>Historique</h2>
+    <button class="fermer" data-fermer>×</button>
+  </div>
+  <div class="feuille-corps">
+    <div class="filtres" id="histFiltres"></div>
+    <div id="histListe"></div>
+  </div>
+  <div class="feuille-pied">
+    <button class="btn gris" id="histVider">Effacer l'historique</button>
+    <button class="btn bleu" data-fermer>Fermer</button>
+  </div>
+</section>
+
+<!-- Feuille Identité -->
+<section class="feuille" id="feuilleQui" style="top:auto;height:auto;border-radius:22px 22px 0 0">
+  <div class="feuille-tete">
+    <h2>Qui es-tu ?</h2>
+    <button class="fermer" data-fermer>×</button>
+  </div>
+  <div class="feuille-corps form">
+    <p style="margin:0 0 4px;font-size:14px;color:var(--gris)">
+      Ton nom apparaît dans l'historique à côté de ce que tu prends ou ranges.
+    </p>
+    <label>Ton prénom</label>
+    <input id="quiNom" type="text" placeholder="Ex. Dorine" autocomplete="name">
+  </div>
+  <div class="feuille-pied">
+    <button class="btn bleu" id="quiValider">C'est moi</button>
   </div>
 </section>
 
@@ -346,6 +430,44 @@
   produits = charger();
   sauver();
 
+  // ---------- Identité ----------
+  const CLE_QUI = 'malle-dorine-qui', CLE_HIST = 'malle-dorine-hist';
+  let qui = '';
+  try { qui = localStorage.getItem(CLE_QUI) || ''; } catch (e) {}
+
+  function initiales(nom) {
+    return nom.trim().split(/[\s-]+/).filter(Boolean).slice(0, 2).map(m => m[0].toUpperCase()).join('') || '?';
+  }
+  function majPuce() {
+    $('puceInit').textContent = qui ? initiales(qui) : '?';
+    $('puceNom').textContent = qui || 'Qui es-tu ?';
+  }
+  function definirQui(nom) {
+    qui = nom.trim().slice(0, 24);
+    try { localStorage.setItem(CLE_QUI, qui); } catch (e) {}
+    majPuce();
+  }
+
+  // ---------- Journal ----------
+  let journal = [];
+  try { const h = localStorage.getItem(CLE_HIST); if (h) journal = JSON.parse(h) || []; } catch (e) {}
+  if (!Array.isArray(journal)) journal = [];
+
+  function noter(type, nom, n, apres) {
+    const moi = qui || 'Anonyme', d = journal[0];
+    // Plusieurs appuis de suite sur le même produit = une seule ligne d'historique
+    if (d && d.qui === moi && d.type === type && d.nom === nom && Date.now() - d.t < 120000 &&
+        (type === 'pris' || type === 'ajoute')) {
+      d.n += (n || 0); d.apres = apres; d.t = Date.now();
+      if (d.n <= 0) journal.shift();
+      try { localStorage.setItem(CLE_HIST, JSON.stringify(journal)); } catch (e) {}
+      return;
+    }
+    journal.unshift({ t: Date.now(), qui: moi, type, nom, n: n || 0, apres });
+    if (journal.length > 400) journal.length = 400;
+    try { localStorage.setItem(CLE_HIST, JSON.stringify(journal)); } catch (e) {}
+  }
+
   // ---------- Statut ----------
   function joursRestants(date) {
     if (!date) return null;
@@ -413,11 +535,11 @@
         el.querySelector('.moins').addEventListener('click', e => {
           e.stopPropagation();
           if (p.qte <= 0) return;
-          p.qte -= 1; sauver(); majLigne(el, p);
+          p.qte -= 1; sauver(); majLigne(el, p); noter('pris', p.nom, 1, p.qte);
         });
         el.querySelector('.plus').addEventListener('click', e => {
           e.stopPropagation();
-          p.qte += 1; sauver(); majLigne(el, p);
+          p.qte += 1; sauver(); majLigne(el, p); noter('ajoute', p.nom, 1, p.qte);
         });
         liste.appendChild(el);
       });
@@ -489,6 +611,7 @@
     Object.entries(panier).forEach(([id, n]) => {
       if (!n) return; const p = produits.find(x => x.id === id); if (!p) return;
       p.qte = Math.max(0, p.qte + (mode === 'prendre' ? -n : n)); resume.push(n + ' × ' + p.nom);
+      noter(mode === 'prendre' ? 'pris' : 'ajoute', p.nom, n, p.qte);
     });
     sauver(); fermerTout(); rendu();
     toast((mode === 'prendre' ? 'Pris : ' : 'Ajouté : ') + resume.join(', '));
@@ -518,8 +641,15 @@
     const nom = $('fNom').value.trim(); if (!nom) { toast('Il faut un nom'); $('fNom').focus(); return; }
     const data = { nom, cat: $('fCat').value, qte: Math.max(0, parseInt($('fQte').value, 10) || 0),
       unite: $('fUnite').value.trim(), date: $('fDate').value, min: Math.max(0, parseInt($('fMin').value, 10) || 0) };
-    if (editId) { Object.assign(produits.find(x => x.id === editId), data); }
-    else { produits.push({ id: 'p' + Date.now(), ...data }); }
+    if (editId) {
+      const p = produits.find(x => x.id === editId), avant = p.qte, ancien = p.nom;
+      Object.assign(p, data);
+      noter('modifie', nom, data.qte - avant, data.qte);
+      if (ancien !== nom) journal[0].ancien = ancien;
+    } else {
+      produits.push({ id: 'p' + Date.now(), ...data });
+      noter('cree', nom, data.qte, data.qte);
+    }
     sauver(); fermerTout(); rendu();
     toast(editId ? 'Produit enregistré' : nom + ' ajouté à la boîte');
     if (retourMouv) ouvrirMouv('ajouter');
@@ -527,20 +657,110 @@
   $('fSupprimer').addEventListener('click', () => {
     const p = produits.find(x => x.id === editId);
     if (p && confirm('Supprimer « ' + p.nom + ' » de la boîte ?')) {
-      produits = produits.filter(x => x.id !== editId); sauver(); fermerTout(); rendu(); toast('Produit supprimé');
+      produits = produits.filter(x => x.id !== editId);
+      noter('supprime', p.nom, 0, 0);
+      sauver(); fermerTout(); rendu(); toast('Produit supprimé');
     }
   });
 
   $('btnReset').addEventListener('click', () => {
-    if (confirm('Remplacer tout le contenu actuel par les provisions d\'exemple ?')) { sauver(exemples()); rendu(); toast('Provisions d\'exemple remises'); }
+    if (confirm('Remplacer tout le contenu actuel par les provisions d\'exemple ?')) {
+      sauver(exemples()); noter('reset', 'toute la malle', 0, 0); rendu(); toast('Provisions d\'exemple remises');
+    }
   });
+
+  // ---------- Écran Historique ----------
+  let filtreQui = '';
+  const VERBES = {
+    pris: ['a pris', 'pris'], ajoute: ['a rangé', 'ajoute'], cree: ['a créé', 'cree'],
+    modifie: ['a modifié', 'modifie'], supprime: ['a supprimé', 'supprime'], reset: ['a réinitialisé', 'supprime']
+  };
+  function quand(t) {
+    const m = Math.round((Date.now() - t) / 60000);
+    if (m < 1) return 'à l\'instant';
+    if (m < 60) return 'il y a ' + m + ' min';
+    const d = new Date(t), hh = String(d.getHours()).padStart(2, '0') + 'h' + String(d.getMinutes()).padStart(2, '0');
+    return 'à ' + hh;
+  }
+  function jourDe(t) {
+    const d = new Date(t); d.setHours(0, 0, 0, 0);
+    const auj = new Date(); auj.setHours(0, 0, 0, 0);
+    const ec = Math.round((auj - d) / 86400000);
+    if (ec === 0) return 'Aujourd\'hui';
+    if (ec === 1) return 'Hier';
+    return d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+  }
+  function renduHist() {
+    const noms = [...new Set(journal.map(e => e.qui))];
+    const f = $('histFiltres'); f.innerHTML = '';
+    if (noms.length > 1) {
+      [''].concat(noms).forEach(n => {
+        const b = document.createElement('button');
+        b.textContent = n || 'Tout le monde';
+        if (n === filtreQui) b.classList.add('actif');
+        b.addEventListener('click', () => { filtreQui = n; renduHist(); });
+        f.appendChild(b);
+      });
+    }
+    const cont = $('histListe'); cont.innerHTML = '';
+    const evts = journal.filter(e => !filtreQui || e.qui === filtreQui);
+    if (!evts.length) {
+      cont.innerHTML = '<div class="vide">Rien pour le moment.<br>Les mouvements de la malle s\'afficheront ici.</div>';
+      return;
+    }
+    let jourCourant = null;
+    evts.forEach(e => {
+      const j = jourDe(e.t);
+      if (j !== jourCourant) {
+        jourCourant = j;
+        const h = document.createElement('div'); h.className = 'jour'; h.textContent = j; cont.appendChild(h);
+      }
+      const [verbe, classe] = VERBES[e.type] || ['a touché', ''];
+      const el = document.createElement('div'); el.className = 'evt ' + classe;
+      el.innerHTML = '<div class="qui"></div><div class="txt"><span class="phrase"></span>' +
+        '<span class="quand"></span></div><div class="delta"></div>';
+      el.querySelector('.qui').textContent = initiales(e.qui);
+      const ph = el.querySelector('.phrase');
+      ph.appendChild(Object.assign(document.createElement('b'), { textContent: e.qui }));
+      let suite = ' ' + verbe + ' ';
+      if (e.type === 'pris' || e.type === 'ajoute') suite += e.n + ' × ' + e.nom;
+      else if (e.type === 'reset') suite += 'la malle';
+      else if (e.type === 'modifie' && e.ancien) suite += e.ancien + ' → ' + e.nom;
+      else suite += e.nom;
+      ph.appendChild(document.createTextNode(suite));
+      el.querySelector('.quand').textContent = quand(e.t) +
+        (e.type === 'pris' || e.type === 'ajoute' || e.type === 'cree' ? ' · il en reste ' + e.apres : '');
+      el.querySelector('.delta').textContent = (e.type === 'pris' ? '−' : e.type === 'ajoute' || e.type === 'cree' ? '+' : '') +
+        (e.n ? e.n : '');
+      cont.appendChild(el);
+    });
+  }
+  $('puceHist').addEventListener('click', () => { filtreQui = ''; renduHist(); ouvrir('feuilleHist'); });
+  $('histVider').addEventListener('click', () => {
+    if (confirm('Effacer tout l\'historique ? Le stock n\'est pas touché.')) {
+      journal = []; try { localStorage.setItem(CLE_HIST, '[]'); } catch (e) {}
+      renduHist(); toast('Historique effacé');
+    }
+  });
+
+  // ---------- Écran Identité ----------
+  function demanderQui() { $('quiNom').value = qui; ouvrir('feuilleQui'); setTimeout(() => $('quiNom').focus(), 50); }
+  $('puceQui').addEventListener('click', demanderQui);
+  $('quiValider').addEventListener('click', () => {
+    const n = $('quiNom').value.trim();
+    if (!n) { toast('Il faut un prénom'); $('quiNom').focus(); return; }
+    definirQui(n); fermerTout(); toast('Bonjour ' + qui + ' !');
+  });
+  $('quiNom').addEventListener('keydown', e => { if (e.key === 'Enter') $('quiValider').click(); });
 
   // ---------- Utilitaires ----------
   let toastTimer;
   function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('visible'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('visible'), 2600); }
   function echap(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
 
+  majPuce();
   rendu();
+  if (!qui) setTimeout(demanderQui, 400);
 })();
 </script>
 </body>
