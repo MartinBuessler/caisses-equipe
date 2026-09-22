@@ -1,0 +1,74 @@
+name: Verification a chaque changement
+
+# Se declenche a CHAQUE modification d'une caisse, y compris celles faites
+# depuis un telephone. Trois roles :
+#   1. verifier que le fichier est lisible et coherent
+#   2. le restaurer tout seul s'il est casse, sans intervention
+#   3. deposer une copie hors de la branche, conservee 90 jours
+
+on:
+  push:
+    paths:
+      - "data/**.json"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: verification
+  cancel-in-progress: false
+
+jobs:
+  verifier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 20      # il faut l'historique pour pouvoir restaurer
+
+      - name: Controler chaque caisse
+        id: controle
+        run: |
+          echo "casse=" >> "$GITHUB_OUTPUT"
+          CASSES=""
+          for f in data/*.json; do
+            if python3 outils/verifier-caisse.py "$f"; then
+              echo "ok      $f"
+            else
+              echo "::warning::$f est invalide, restauration en cours"
+              CASSES="$CASSES $f"
+            fi
+          done
+          echo "casses=$CASSES" >> "$GITHUB_OUTPUT"
+
+      - name: Restaurer les caisses cassees depuis la derniere version saine
+        if: steps.controle.outputs.casses != ''
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for f in ${{ steps.controle.outputs.casses }}; do
+            trouve=""
+            for c in $(git log --format=%H -n 20 -- "$f"); do
+              if git show "$c:$f" > /tmp/essai.json 2>/dev/null && python3 outils/verifier-caisse.py /tmp/essai.json; then
+                cp /tmp/essai.json "$f"
+                trouve="$c"
+                echo "::notice::$f restaure depuis $c"
+                break
+              fi
+            done
+            if [ -z "$trouve" ]; then
+              echo "::error::aucune version saine trouvee pour $f"
+              exit 1
+            fi
+          done
+          git add data
+          git commit -m "Restauration automatique d'une caisse illisible"
+          git push
+
+      - name: Copie hors de la branche, conservee 90 jours
+        uses: actions/upload-artifact@v4
+        with:
+          name: caisses-${{ github.sha }}
+          path: data/*.json
+          retention-days: 90

@@ -118,14 +118,25 @@ chips, sans perte.
 
 ## Sauvegardes
 
-Trois niveaux, du plus simple au plus solide :
+Quatre filets, du plus immédiat au plus lointain :
 
-1. **L'historique Git.** Chaque modification depuis un téléphone est un commit. Tout
-   état passé est consultable et restaurable.
-2. **Une copie datée par jour**, dans `sauvegardes/AAAA-MM-JJ/`, produite
-   automatiquement à 3 h par GitHub Actions. Les soixante dernières sont conservées.
-3. **Une archive téléchargeable**, conservée 90 jours, hors de la branche, visible
-   dans l'onglet Actions.
+1. **À chaque changement, un commit.** Une prise notée sur un téléphone devient
+   aussitôt une version dans l'historique Git. Rien n'attend la nuit.
+2. **À chaque changement, une vérification automatique.** Le fichier est contrôlé
+   dès son arrivée : JSON lisible, champs présents, quantités positives, pas
+   d'identifiant en double. S'il est abîmé, la dernière version saine est remise
+   toute seule et un commit « Restauration automatique » le signale. Aucune
+   intervention n'est nécessaire.
+3. **À chaque changement, une copie hors de la branche**, conservée 90 jours dans
+   l'onglet Actions. Elle survit même à une réécriture de l'historique.
+4. **Une copie datée par jour**, dans `sauvegardes/AAAA-MM-JJ/`, produite à 3 h.
+   Les soixante dernières sont conservées.
+
+Pour contrôler une caisse à la main :
+
+```powershell
+python outils/verifier-caisse.py data/epicerie.json
+```
 
 **Restaurer une journée** :
 

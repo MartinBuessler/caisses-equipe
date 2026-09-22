@@ -117,6 +117,25 @@
   .badge.bas { background: var(--orange-clair); color: var(--orange); }
   .vide { text-align: center; color: var(--gris); padding: 40px 10px; }
 
+  /* Bandeau tant que les modifications ne partent pas en ligne */
+  .alerte-sync {
+    display: none; align-items: center; gap: 10px; margin-bottom: 10px;
+    background: var(--orange-clair); border: 1px solid #f0c98a; color: #8a4b00;
+    border-radius: var(--radius); padding: 11px 13px; font-size: 13.5px; line-height: 1.35;
+  }
+  .alerte-sync.visible { display: flex; }
+  .alerte-sync b { display: block; color: #6d3b00; }
+  .alerte-sync button {
+    margin-left: auto; flex-shrink: 0; border: none; background: var(--orange); color: #fff;
+    border-radius: 10px; padding: 9px 13px; font-size: 13px; font-weight: 800;
+  }
+  .etapes { margin: 6px 0 0; padding-left: 18px; font-size: 13px; color: var(--texte); line-height: 1.5; }
+  .etapes li { margin-bottom: 3px; }
+  .lien-cle {
+    display: block; text-align: center; background: var(--bleu); color: #fff; text-decoration: none;
+    border-radius: 12px; padding: 13px; font-weight: 800; font-size: 15px; margin: 10px 0 2px;
+  }
+
   /* ---------- Historique ---------- */
   .jour {
     margin: 18px 0 8px; font-size: 12px; font-weight: 800; letter-spacing: .06em;
@@ -254,6 +273,10 @@
 </header>
 
 <main>
+  <div class="alerte-sync" id="alerteSync">
+    <div><b>Rien n'est enregistré en ligne</b>Tes changements restent sur ce téléphone.</div>
+    <button id="alerteActiver">Activer</button>
+  </div>
   <input class="recherche" id="recherche" type="search" placeholder="Rechercher un produit…" autocomplete="off">
   <div id="liste"></div>
   <div class="pied">
@@ -337,27 +360,39 @@
   </div>
   <div class="feuille-corps form">
     <div class="recap actif" id="syncResume">…</div>
-    <p style="font-size:13px;color:var(--gris);margin:0 0 6px">
-      Les données de cette caisse sont enregistrées sur GitHub. Chaque modification y devient une version
-      que l'on peut retrouver, donc rien ne se perd.
-    </p>
+
+    <div id="blocActiver">
+      <p style="font-size:13.5px;margin:0">
+        Pour que tout parte en ligne, il faut une clé GitHub. À faire <b>une seule fois</b> pour
+        toute l'équipe et toutes les caisses. Ensuite, plus personne n'a rien à régler.
+      </p>
+      <a class="lien-cle" id="lienCle" target="_blank" rel="noopener">Créer la clé sur GitHub</a>
+      <ol class="etapes">
+        <li>Repository access → <b>Only select repositories</b> → <span id="nomDepot"></span></li>
+        <li>Permissions → Repository permissions → <b>Contents</b> → <b>Read and write</b></li>
+        <li>Expiration : un an, puis <b>Generate token</b></li>
+        <li>Copie la clé et colle-la ci-dessous</li>
+      </ol>
+    </div>
+
+    <label>Clé d'écriture de l'équipe</label>
+    <input id="syncJeton" type="password" placeholder="github_pat_…" autocomplete="off"
+           autocapitalize="off" autocorrect="off" spellcheck="false">
+    <p style="font-size:12px;color:var(--gris);margin:6px 0 0" id="astuceLien"></p>
+
     <label>Caisse</label>
     <input id="syncCaisse" type="text" readonly>
     <label>Fichier des données</label>
     <input id="syncFichier" type="text" readonly>
-    <label>Clé d'écriture de l'équipe</label>
-    <input id="syncJeton" type="password" placeholder="github_pat_… (collée une seule fois)" autocomplete="off">
-    <p style="font-size:12px;color:var(--gris);margin:6px 0 0">
-      Sans clé, la caisse s'affiche et tes changements restent sur ce téléphone.
-      Avec la clé, ils sont enregistrés en ligne et visibles par toute l'équipe.
-    </p>
+
     <div class="danger" style="margin-top:18px">
       <button id="syncOublier">Oublier la clé sur ce téléphone</button>
     </div>
   </div>
-  <div class="feuille-pied">
-    <button class="btn gris" id="syncExport">Exporter</button>
-    <button class="btn bleu" id="syncMaintenant">Enregistrer maintenant</button>
+  <div class="feuille-pied" style="flex-wrap:wrap">
+    <button class="btn gris" id="syncExport" style="flex:0 0 auto;padding-left:18px;padding-right:18px">Exporter</button>
+    <button class="btn contour" id="syncPartager" style="display:none">Lien d'équipe</button>
+    <button class="btn bleu" id="syncMaintenant">Enregistrer</button>
   </div>
 </section>
 
@@ -529,6 +564,9 @@
   }
 
   // ---------- Synchronisation avec GitHub ----------
+  const MSG_401 = 'la clé est fausse ou a expiré';
+  const MSG_403 = 'la clé n\'a pas le droit « Contents : Read and write »';
+  const MSG_404 = 'la clé ne couvre pas le dépôt ' + DEPOT.nom;
   const API = 'https://api.github.com/repos/' + DEPOT.chemin + '/contents/' + FICHIER;
   const BRUT = 'https://raw.githubusercontent.com/' + DEPOT.chemin + '/' + DEPOT.branche + '/' + FICHIER;
 
@@ -551,7 +589,8 @@
         headers: { Authorization: 'Bearer ' + jeton, Accept: 'application/vnd.github+json' }
       });
       if (r.status === 404) { shaDistant = null; return null; }
-      if (r.status === 401 || r.status === 403) throw new Error('jeton refusé');
+      if (r.status === 401) throw new Error(MSG_401);
+      if (r.status === 403) throw new Error(MSG_403);
       if (!r.ok) throw new Error('lecture ' + r.status);
       const d = await r.json();
       shaDistant = d.sha;
@@ -572,7 +611,9 @@
       body: JSON.stringify(corps)
     });
     if (r.status === 409 || r.status === 422) throw new Error('conflit');
-    if (r.status === 401 || r.status === 403) throw new Error('jeton refusé');
+    if (r.status === 401) throw new Error(MSG_401);
+    if (r.status === 403) throw new Error(MSG_403);
+    if (r.status === 404) throw new Error(MSG_404);
     if (!r.ok) throw new Error('écriture ' + r.status);
     const d = await r.json();
     shaDistant = d.content.sha;
@@ -581,7 +622,7 @@
   let syncEnCours = false, minuteur = null;
   function planifierSync(delai) {
     clearTimeout(minuteur);
-    minuteur = setTimeout(synchroniser, delai === undefined ? 2500 : delai);
+    minuteur = setTimeout(synchroniser, delai === undefined ? 1200 : delai);
   }
 
   async function synchroniser(forcee) {
@@ -606,7 +647,9 @@
       if (etat.journal.length > 400) etat.journal.length = 400;
       etat.maj = new Date().toISOString();
 
-      if (jeton && (ops.length || neuve)) {
+      // « forcee » = l'utilisateur vient de coller une clé : on écrit vraiment,
+      // pour vérifier tout de suite qu'elle a bien le droit d'écriture.
+      if (jeton && (ops.length || neuve || forcee)) {
         await ecrireDistant(etat, 'Caisse ' + CAISSE + ' : ' + (ops.length || 1) + ' modification(s)');
         ops = [];
       }
@@ -902,13 +945,26 @@
   // ---------- Écran Enregistrement ----------
   const LIBELLES = {
     attente: 'Connexion…', encours: 'Enregistrement…', ok: 'Enregistré',
-    local: 'Sur ce téléphone', lecture: 'Lecture seule', horsligne: 'Hors ligne',
+    local: 'Non enregistré', lecture: 'À activer', horsligne: 'Hors ligne',
     erreur: 'Erreur', conflit: 'Fusion…'
   };
   function majSync(e) {
     etatSync = e;
     $('voyantSync').className = 'voyant ' + e;
     $('texteSync').textContent = LIBELLES[e] || e;
+    // Le bandeau reste tant que quelque chose n'est pas parti en ligne
+    const aRegler = (!jeton && e !== 'encours') || e === 'erreur' || (e === 'local' && ops.length);
+    $('alerteSync').classList.toggle('visible', !!aRegler);
+    if (e === 'erreur') {
+      $('alerteSync').querySelector('b').textContent = 'Enregistrement refusé';
+      $('alerteSync').querySelector('div').lastChild.textContent = detailSync + '.';
+    } else if (!jeton) {
+      $('alerteSync').querySelector('b').textContent = "Rien n'est enregistré en ligne";
+      $('alerteSync').querySelector('div').lastChild.textContent = 'Tes changements restent sur ce téléphone.';
+    } else {
+      $('alerteSync').querySelector('b').textContent = ops.length + ' modification(s) en attente';
+      $('alerteSync').querySelector('div').lastChild.textContent = 'Pas encore parties en ligne.';
+    }
     if ($('feuilleSync').classList.contains('ouvert')) renduSync();
   }
   function renduSync() {
@@ -917,24 +973,51 @@
     let txt = '';
     if (etatSync === 'ok') txt = 'Tout est enregistré en ligne.';
     else if (etatSync === 'encours') txt = 'Enregistrement en cours…';
-    else if (etatSync === 'lecture') txt = 'Lecture seule : colle la clé de l\'équipe pour enregistrer en ligne.';
+    else if (etatSync === 'lecture') txt = "Aucune clé sur ce téléphone : tes changements ne partent pas en ligne.";
     else if (etatSync === 'local') txt = enAttente + ' modification(s) gardée(s) sur ce téléphone, pas encore en ligne.';
-    else if (etatSync === 'horsligne') txt = 'Hors ligne. L\'enregistrement reprendra au retour du réseau.';
-    else if (etatSync === 'conflit') txt = 'Quelqu\'un a modifié la caisse en même temps. Fusion en cours.';
-    else if (etatSync === 'erreur') txt = 'Échec de l\'enregistrement : ' + detailSync;
+    else if (etatSync === 'horsligne') txt = "Hors ligne. L'enregistrement reprendra au retour du réseau.";
+    else if (etatSync === 'conflit') txt = "Quelqu'un a modifié la caisse en même temps. Fusion en cours.";
+    else if (etatSync === 'erreur') txt = 'Enregistrement refusé : ' + detailSync + '.';
     else txt = 'Connexion à GitHub…';
     if (dernierSync) txt += ' Dernière lecture à ' + heureDe(dernierSync) + '.';
     r.textContent = txt;
+    $('blocActiver').style.display = jeton && etatSync !== 'erreur' ? 'none' : '';
+    $('nomDepot').textContent = DEPOT.nom;
+    $('lienCle').href = 'https://github.com/settings/personal-access-tokens/new';
+    $('astuceLien').textContent = jeton
+      ? "Pour équiper un autre téléphone sans rien retaper, envoie-lui le lien d'équipe (bouton ci-dessous)."
+      : "La clé reste sur ce téléphone. Elle n'apparaît ni dans la page ni sur GitHub.";
+    $('syncPartager').style.display = jeton ? '' : 'none';
     $('syncCaisse').value = CAISSE;
     $('syncFichier').value = DEPOT.chemin + ' · ' + FICHIER;
     $('syncJeton').value = jeton;
   }
-  $('puceSync').addEventListener('click', () => { renduSync(); ouvrir('feuilleSync'); });
+  function ouvrirSync() { renduSync(); ouvrir('feuilleSync'); if (!jeton) setTimeout(() => $('syncJeton').focus(), 60); }
+  $('puceSync').addEventListener('click', ouvrirSync);
+  $('alerteActiver').addEventListener('click', ouvrirSync);
+
+  // Un lien qui installe la clé sur le téléphone suivant, sans rien retaper
+  $('syncPartager').addEventListener('click', async () => {
+    const lien = location.origin + location.pathname + '?c=' + CAISSE + '#k=' + jeton;
+    try {
+      if (navigator.share) { await navigator.share({ title: nomCaisse, url: lien }); return; }
+      await navigator.clipboard.writeText(lien);
+      toast("Lien d'équipe copié");
+    } catch (e) {
+      prompt("Copie ce lien et envoie-le à l'équipe :", lien);
+    }
+  });
   $('syncMaintenant').addEventListener('click', () => {
     const v = $('syncJeton').value.trim();
-    if (v && v !== jeton) { jeton = v; try { localStorage.setItem(CLE_JETON, jeton); } catch (e) {} }
+    if (v !== jeton) { jeton = v; try { localStorage.setItem(CLE_JETON, jeton); } catch (e) {} }
+    if (!jeton) { toast('Colle la clé de l\'équipe au-dessus'); $('syncJeton').focus(); return; }
     shaDistant = null;
-    synchroniser(true).then(() => { renduSync(); toast(etatSync === 'ok' ? 'Enregistré en ligne' : 'Pas enregistré : ' + (LIBELLES[etatSync] || '')); });
+    majSync('encours');
+    synchroniser(true).then(() => {
+      renduSync();
+      if (etatSync === 'ok') { fermerTout(); toast('Tout est enregistré en ligne'); }
+      else toast(etatSync === 'erreur' ? 'Refusé : ' + detailSync : 'Pas encore enregistré');
+    });
   });
   $('syncOublier').addEventListener('click', () => {
     jeton = ''; try { localStorage.removeItem(CLE_JETON); } catch (e) {}
