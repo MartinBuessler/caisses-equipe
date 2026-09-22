@@ -1,0 +1,173 @@
+# Déployer et séparer les caisses
+
+Ce dépôt héberge à la fois la page et les données. Une caisse, c'est trois choses :
+un identifiant, un fichier `data/<id>.json`, une adresse `?c=<id>`. Rien d'autre.
+
+| | |
+| --- | --- |
+| Dépôt | `MartinBuessler/caisses-equipe` |
+| Site | https://martinbuessler.github.io/caisses-equipe/ |
+| Caisses existantes | `epicerie`, `kine` |
+
+---
+
+## 1. Créer la caisse d'un kiné
+
+Une commande, dans le dossier du projet :
+
+```bash
+python outils/creer-caisse.py kine-antoine --nom "Malle d'Antoine" --modele kine
+```
+
+Elle écrit `data/kine-antoine.json` avec un stock de kiné crédible (strapping, soins,
+matériel) et inscrit la caisse dans `caisses.json`.
+
+Options utiles :
+
+```bash
+# une caisse vide, à remplir depuis le téléphone
+python outils/creer-caisse.py kine-lea --nom "Malle de Léa" --vide
+
+# des catégories sur mesure
+python outils/creer-caisse.py buvette --nom "Buvette" --categories "Boissons,Snacks" --vide
+```
+
+Chaque caisse impose ses propres catégories. L'épicerie affiche Sucré et Salé, une malle
+de kiné affiche Strapping, Soins et Matériel. La page s'adapte à la caisse ouverte.
+
+## 2. Publier
+
+```bash
+git add -A
+git commit -m "Nouvelle caisse : Malle d'Antoine"
+git push
+```
+
+Une minute plus tard, la caisse est en ligne à l'adresse
+`https://martinbuessler.github.io/caisses-equipe/?c=kine-antoine`.
+
+## 3. Imprimer l'étiquette
+
+```bash
+python outils/generer-qr.py kine-antoine
+```
+
+Quatre fichiers apparaissent dans `qr/` : le QR seul en PNG et en SVG, l'étiquette A6
+en PDF prête à imprimer et son aperçu PNG. Sans argument, la commande régénère toutes
+les caisses.
+
+L'étiquette fait 105 × 148 mm, soit un quart de A4. Imprime en taille réelle, sans
+« ajuster à la page », sinon le QR rétrécit.
+
+---
+
+## Enregistrement et droits d'écriture
+
+Sans clé, la page affiche le stock et garde les modifications sur le téléphone, rien
+de plus. Avec la clé de l'équipe, chaque modification part sur GitHub et devient
+visible par tout le monde.
+
+**Créer la clé**, une seule fois pour toutes les caisses :
+
+1. GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens
+2. Generate new token
+3. Repository access → Only select repositories → `caisses-equipe`
+4. Permissions → Repository permissions → **Contents : Read and write**
+5. Expiration : un an
+6. Generate, puis copie la clé `github_pat_…` immédiatement, elle ne se réaffiche jamais
+
+**Installer la clé sur un téléphone** : ouvrir la caisse, toucher la pastille en haut
+à gauche, coller la clé dans le champ, puis « Enregistrer maintenant ». La pastille
+passe au vert. C'est à faire une fois par téléphone, pas par caisse.
+
+Plus rapide pour un groupe : envoie le lien
+`https://martinbuessler.github.io/caisses-equipe/?c=epicerie#k=LA_CLE`. Au premier
+ouverture la clé est rangée puis effacée de la barre d'adresse.
+
+> Ce lien contient la clé. Il se transmet à l'équipe, pas sur l'étiquette collée sur
+> la caisse ni sur un groupe ouvert. En cas de fuite, révoque la clé sur GitHub et
+> refais-en une : le dépôt n'est pas exposé au-delà de ce seul dossier, et l'historique
+> permet de revenir en arrière.
+
+## Deux téléphones en même temps
+
+Les modifications ne s'écrasent pas. Chaque téléphone garde la liste de ce qu'il a
+fait, la rejoue sur la version du serveur, puis réécrit. Si quelqu'un a écrit entre
+temps, la fusion est refaite automatiquement. Une personne qui sort deux bananes et
+une autre qui range trois chips aboutissent bien à moins deux bananes et plus trois
+chips, sans perte.
+
+## Sauvegardes
+
+Trois niveaux, du plus simple au plus solide :
+
+1. **L'historique Git.** Chaque modification depuis un téléphone est un commit. Tout
+   état passé est consultable et restaurable.
+2. **Une copie datée par jour**, dans `sauvegardes/AAAA-MM-JJ/`, produite
+   automatiquement à 3 h par GitHub Actions. Les soixante dernières sont conservées.
+3. **Une archive téléchargeable**, conservée 90 jours, hors de la branche, visible
+   dans l'onglet Actions.
+
+**Restaurer une journée** :
+
+```bash
+git pull
+cp sauvegardes/2026-09-20/epicerie.json data/epicerie.json
+git commit -am "Retour de l'epicerie au 20 septembre"
+git push
+```
+
+**Annuler une seule bêtise**, sans tout restaurer :
+
+```bash
+git log --oneline -- data/epicerie.json     # repérer le commit fautif
+git revert <commit>
+git push
+```
+
+Le bouton « Exporter » dans la page enregistre aussi la caisse courante en JSON sur
+le téléphone, pratique avant une manipulation risquée.
+
+---
+
+## Séparer une caisse dans son propre dépôt
+
+Utile si les kinés doivent gérer leurs malles sans toucher au reste, avec leurs
+propres droits. Le prix à payer : deux sites, deux clés, deux sauvegardes à surveiller.
+
+```bash
+# 1. nouveau dépôt à partir de celui-ci
+gh repo create malles-kine --public --clone
+cd malles-kine
+cp -r ../caisses-equipe/{index.html,outils,.github} .
+mkdir data && cp ../caisses-equipe/data/kine*.json data/
+cp ../caisses-equipe/caisses.json .
+
+# 2. pointer le code vers le nouveau dépôt : dans index.html, bloc DEPOT,
+#    remplacer  nom: 'caisses-equipe'  par  nom: 'malles-kine'
+#    et         caisseParDefaut: 'epicerie'  par  'kine'
+#    dans outils/generer-qr.py, corriger SITE de la même façon
+
+# 3. publier
+git add -A && git commit -m "Malles des kinés" && git push
+gh api -X POST repos/MartinBuessler/malles-kine/pages \
+  -f "source[branch]=main" -f "source[path]=/"
+
+# 4. étiquettes à la nouvelle adresse
+python outils/generer-qr.py
+```
+
+Il faut alors une clé distincte, limitée à `malles-kine`, et retirer les fichiers
+`data/kine*.json` de l'ancien dépôt pour éviter deux vérités.
+
+## Ce que ce montage ne fait pas
+
+- **Le dépôt est public, donc le contenu des caisses est lisible par tous.** C'est un
+  inventaire de nourriture et de matériel, sans donnée personnelle. Si cela devient
+  gênant, passe le dépôt en privé : le site cesse alors d'être servi par GitHub Pages
+  et il faut un autre hébergeur.
+- **Écrire demande la clé.** Quelqu'un qui scanne sans l'avoir voit le stock et peut
+  noter ses prises, mais elles restent sur son téléphone jusqu'à ce qu'une clé arrive.
+- **Ce n'est pas du temps réel.** La page relit les données toutes les minutes et à
+  chaque retour sur l'écran. Deux personnes devant la caisse voient leurs changements
+  à quelques secondes d'intervalle, pas instantanément.
