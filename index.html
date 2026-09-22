@@ -117,25 +117,6 @@
   .badge.bas { background: var(--orange-clair); color: var(--orange); }
   .vide { text-align: center; color: var(--gris); padding: 40px 10px; }
 
-  /* Bandeau tant que les modifications ne partent pas en ligne */
-  .alerte-sync {
-    display: none; align-items: center; gap: 10px; margin-bottom: 10px;
-    background: var(--orange-clair); border: 1px solid #f0c98a; color: #8a4b00;
-    border-radius: var(--radius); padding: 11px 13px; font-size: 13.5px; line-height: 1.35;
-  }
-  .alerte-sync.visible { display: flex; }
-  .alerte-sync b { display: block; color: #6d3b00; }
-  .alerte-sync button {
-    margin-left: auto; flex-shrink: 0; border: none; background: var(--orange); color: #fff;
-    border-radius: 10px; padding: 9px 13px; font-size: 13px; font-weight: 800;
-  }
-  .etapes { margin: 6px 0 0; padding-left: 18px; font-size: 13px; color: var(--texte); line-height: 1.5; }
-  .etapes li { margin-bottom: 3px; }
-  .lien-cle {
-    display: block; text-align: center; background: var(--bleu); color: #fff; text-decoration: none;
-    border-radius: 12px; padding: 13px; font-weight: 800; font-size: 15px; margin: 10px 0 2px;
-  }
-
   /* ---------- Historique ---------- */
   .jour {
     margin: 18px 0 8px; font-size: 12px; font-weight: 800; letter-spacing: .06em;
@@ -273,10 +254,6 @@
 </header>
 
 <main>
-  <div class="alerte-sync" id="alerteSync">
-    <div><b>Rien n'est enregistré en ligne</b>Tes changements restent sur ce téléphone.</div>
-    <button id="alerteActiver">Activer</button>
-  </div>
   <input class="recherche" id="recherche" type="search" placeholder="Rechercher un produit…" autocomplete="off">
   <div id="liste"></div>
   <div class="pied">
@@ -360,39 +337,16 @@
   </div>
   <div class="feuille-corps form">
     <div class="recap actif" id="syncResume">…</div>
-
-    <div id="blocActiver">
-      <p style="font-size:13.5px;margin:0">
-        Pour que tout parte en ligne, il faut une clé GitHub. À faire <b>une seule fois</b> pour
-        toute l'équipe et toutes les caisses. Ensuite, plus personne n'a rien à régler.
-      </p>
-      <a class="lien-cle" id="lienCle" target="_blank" rel="noopener">Créer la clé sur GitHub</a>
-      <ol class="etapes">
-        <li>Repository access → <b>Only select repositories</b> → <span id="nomDepot"></span></li>
-        <li>Permissions → Repository permissions → <b>Contents</b> → <b>Read and write</b></li>
-        <li>Expiration : un an, puis <b>Generate token</b></li>
-        <li>Copie la clé et colle-la ci-dessous</li>
-      </ol>
-    </div>
-
-    <label>Clé d'écriture de l'équipe</label>
-    <input id="syncJeton" type="password" placeholder="github_pat_…" autocomplete="off"
-           autocapitalize="off" autocorrect="off" spellcheck="false">
-    <p style="font-size:12px;color:var(--gris);margin:6px 0 0" id="astuceLien"></p>
-
+    <p style="font-size:13.5px;margin:0">
+      Cette caisse est enregistrée en ligne automatiquement, à chaque changement.
+      Tout le monde voit le même stock, il n'y a rien à régler.
+    </p>
     <label>Caisse</label>
     <input id="syncCaisse" type="text" readonly>
-    <label>Fichier des données</label>
-    <input id="syncFichier" type="text" readonly>
-
-    <div class="danger" style="margin-top:18px">
-      <button id="syncOublier">Oublier la clé sur ce téléphone</button>
-    </div>
   </div>
-  <div class="feuille-pied" style="flex-wrap:wrap">
-    <button class="btn gris" id="syncExport" style="flex:0 0 auto;padding-left:18px;padding-right:18px">Exporter</button>
-    <button class="btn contour" id="syncPartager" style="display:none">Lien d'équipe</button>
-    <button class="btn bleu" id="syncMaintenant">Enregistrer</button>
+  <div class="feuille-pied">
+    <button class="btn gris" id="syncExport">Exporter</button>
+    <button class="btn bleu" id="syncMaintenant">Actualiser</button>
   </div>
 </section>
 
@@ -401,14 +355,17 @@
 <script>
 (function () {
   'use strict';
-  // ---------- Dépôt GitHub qui héberge le site ET les données ----------
-  const DEPOT = {
-    proprietaire: 'MartinBuessler',
-    nom: 'caisses-equipe',
-    branche: 'main',
+  // ---------- Base qui garde les caisses ----------
+  // Firestore, en écriture ouverte mais encadrée par les règles du projet :
+  // celui qui scanne le QR code enregistre sans clé ni réglage.
+  // La clé ci-dessous est la clé web publique, prévue pour figurer dans la page.
+  const BASE = {
+    projet: 'atelier-2sa',
+    cle: 'AIzaSyBPjpEZSx-QxagoFvJbWJtlc9QmHXjlpB4',
     caisseParDefaut: 'epicerie'
   };
-  DEPOT.chemin = DEPOT.proprietaire + '/' + DEPOT.nom;
+  BASE.racine = 'https://firestore.googleapis.com/v1/projects/' + BASE.projet +
+                '/databases/(default)/documents';
 
   // Catégories par défaut ; chaque caisse peut imposer les siennes dans son fichier de données
   let CATEGORIES = ["Sucré", "Salé"];
@@ -468,25 +425,12 @@
   // ---------- Caisse courante ----------
   // Chaque caisse a son fichier de données sur GitHub : data/<caisse>.json
   const P = new URLSearchParams(location.search);
-  const CAISSE = ((P.get('c') || DEPOT.caisseParDefaut).toLowerCase().replace(/[^a-z0-9_-]/g, '') || DEPOT.caisseParDefaut).slice(0, 40);
-  const FICHIER = 'data/' + CAISSE + '.json';
+  const CAISSE = ((P.get('c') || BASE.caisseParDefaut).toLowerCase().replace(/[^a-z0-9_-]/g, '') || BASE.caisseParDefaut).slice(0, 40);
   const CLE_ETAT = 'caisse:' + CAISSE + ':etat';
   const CLE_OPS = 'caisse:' + CAISSE + ':ops';
-  const CLE_JETON = 'caisses:jeton';
-
-  // Jeton d'écriture : arrive par le lien #k=…, est rangé puis effacé de la barre d'adresse
-  let jeton = '';
-  try { jeton = localStorage.getItem(CLE_JETON) || ''; } catch (e) {}
-  (function jetonDuLien() {
-    const m = location.hash.match(/[#&]k=([A-Za-z0-9_\-]{20,})/);
-    if (!m) return;
-    jeton = m[1];
-    try { localStorage.setItem(CLE_JETON, jeton); } catch (e) {}
-    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
-  })();
 
   let produits = [], journal = [], ops = [], nomCaisse = '';
-  let shaDistant = null, dernierSync = 0, etatSync = 'attente', detailSync = '';
+  let versionDistante = null, dernierSync = 0, etatSync = 'attente', detailSync = '';
 
   function sauverLocal() {
     try {
@@ -563,72 +507,64 @@
     enfiler({ type: 'delta', prod: p.id, n, evt });
   }
 
-  // ---------- Synchronisation avec GitHub ----------
-  const MSG_401 = 'la clé est fausse ou a expiré';
-  const MSG_403 = 'la clé n\'a pas le droit « Contents : Read and write »';
-  const MSG_404 = 'la clé ne couvre pas le dépôt ' + DEPOT.nom;
-  const API = 'https://api.github.com/repos/' + DEPOT.chemin + '/contents/' + FICHIER;
-  const BRUT = 'https://raw.githubusercontent.com/' + DEPOT.chemin + '/' + DEPOT.branche + '/' + FICHIER;
-
-  function versB64(txt) {
-    const o = new TextEncoder().encode(txt);
-    let s = ''; o.forEach(c => { s += String.fromCharCode(c); });
-    return btoa(s);
-  }
-  function depuisB64(b) {
-    const bin = atob(String(b).replace(/\s/g, ''));
-    const o = new Uint8Array(bin.length);
-    for (let i = 0; i < bin.length; i++) o[i] = bin.charCodeAt(i);
-    return new TextDecoder().decode(o);
-  }
+  // ---------- Enregistrement dans la base ----------
+  // Un document par caisse : caisses/<identifiant>, avec le contenu en texte.
+  const DOC = BASE.racine + '/caisses/' + encodeURIComponent(CAISSE) + '?key=' + BASE.cle;
+  const COMMIT = BASE.racine.replace(/\/documents$/, '/documents:commit') + '?key=' + BASE.cle;
 
   async function lireDistant() {
-    if (jeton) {
-      const r = await fetch(API + '?ref=' + DEPOT.branche, {
-        cache: 'no-store',
-        headers: { Authorization: 'Bearer ' + jeton, Accept: 'application/vnd.github+json' }
-      });
-      if (r.status === 404) { shaDistant = null; return null; }
-      if (r.status === 401) throw new Error(MSG_401);
-      if (r.status === 403) throw new Error(MSG_403);
-      if (!r.ok) throw new Error('lecture ' + r.status);
-      const d = await r.json();
-      shaDistant = d.sha;
-      return JSON.parse(depuisB64(d.content));
-    }
-    const r = await fetch(BRUT + '?t=' + Date.now(), { cache: 'no-store' });
-    if (r.status === 404) return null;
+    const r = await fetch(DOC + '&t=' + Date.now(), { cache: 'no-store' });
+    if (r.status === 404) { versionDistante = null; return null; }
     if (!r.ok) throw new Error('lecture ' + r.status);
-    return await r.json();
+    const d = await r.json();
+    versionDistante = d.updateTime || null;
+    const brut = d.fields && d.fields.donnees && d.fields.donnees.stringValue;
+    if (!brut) return null;
+    try { return JSON.parse(brut); } catch (e) { return null; }
   }
 
-  async function ecrireDistant(etat, message) {
-    const corps = { message, branch: DEPOT.branche, content: versB64(JSON.stringify(etat, null, 1)) };
-    if (shaDistant) corps.sha = shaDistant;
-    const r = await fetch(API, {
-      method: 'PUT',
-      headers: { Authorization: 'Bearer ' + jeton, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
-      body: JSON.stringify(corps)
+  // Écriture conditionnelle : elle échoue si quelqu'un a écrit entre temps,
+  // ce qui déclenche une relecture puis une nouvelle fusion. Rien n'est écrasé.
+  async function ecrireDistant(etat) {
+    const ecriture = {
+      update: {
+        name: 'projects/' + BASE.projet + '/databases/(default)/documents/caisses/' + CAISSE,
+        fields: {
+          donnees: { stringValue: JSON.stringify(etat) },
+          maj: { stringValue: etat.maj }
+        }
+      },
+      updateMask: { fieldPaths: ['donnees', 'maj'] },
+      currentDocument: versionDistante ? { updateTime: versionDistante } : { exists: false }
+    };
+    const r = await fetch(COMMIT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ writes: [ecriture] })
     });
-    if (r.status === 409 || r.status === 422) throw new Error('conflit');
-    if (r.status === 401) throw new Error(MSG_401);
-    if (r.status === 403) throw new Error(MSG_403);
-    if (r.status === 404) throw new Error(MSG_404);
+    if (r.status === 400 || r.status === 409) {
+      let m = '';
+      try { m = (await r.json()).error.message || ''; } catch (e) {}
+      if (/exist|precondition|version/i.test(m)) throw new Error('conflit');
+      throw new Error('refus : ' + m.slice(0, 80));
+    }
+    if (r.status === 403) throw new Error("la base refuse l'écriture");
     if (!r.ok) throw new Error('écriture ' + r.status);
     const d = await r.json();
-    shaDistant = d.content.sha;
+    versionDistante = (d.writeResults && d.writeResults[0] && d.writeResults[0].updateTime) || null;
   }
 
-  let syncEnCours = false, minuteur = null;
+  let syncEnCours = false, minuteur = null, essais = 0;
   function planifierSync(delai) {
     clearTimeout(minuteur);
-    minuteur = setTimeout(synchroniser, delai === undefined ? 1200 : delai);
+    minuteur = setTimeout(synchroniser, delai === undefined ? 900 : delai);
   }
 
-  async function synchroniser(forcee) {
-    if (syncEnCours) { planifierSync(3000); return; }
+  async function synchroniser() {
+    if (syncEnCours) { planifierSync(2000); return; }
     if (!navigator.onLine) { majSync('horsligne'); return; }
-    syncEnCours = true; majSync('encours');
+    syncEnCours = true;
+    if (ops.length) majSync('encours');
     try {
       let distant = await lireDistant();
       const neuve = !distant;
@@ -647,10 +583,8 @@
       if (etat.journal.length > 400) etat.journal.length = 400;
       etat.maj = new Date().toISOString();
 
-      // « forcee » = l'utilisateur vient de coller une clé : on écrit vraiment,
-      // pour vérifier tout de suite qu'elle a bien le droit d'écriture.
-      if (jeton && (ops.length || neuve || forcee)) {
-        await ecrireDistant(etat, 'Caisse ' + CAISSE + ' : ' + (ops.length || 1) + ' modification(s)');
+      if (ops.length || neuve) {
+        await ecrireDistant(etat);
         ops = [];
       }
       const change = JSON.stringify(produits) !== JSON.stringify(etat.produits) ||
@@ -658,12 +592,20 @@
       produits = etat.produits; journal = etat.journal; nomCaisse = etat.nom;
       sauverLocal(); appliquerNom(); majCategories();
       if (change) { rendu(); if ($('feuilleHist').classList.contains('ouvert')) renduHist(); }
-      dernierSync = Date.now();
-      majSync(ops.length ? 'local' : (jeton ? 'ok' : 'lecture'));
+      dernierSync = Date.now(); essais = 0;
+      majSync('ok');
     } catch (e) {
       detailSync = e.message || String(e);
-      majSync(detailSync === 'conflit' ? 'conflit' : 'erreur');
-      if (detailSync === 'conflit') { shaDistant = null; planifierSync(4000); }
+      if (detailSync === 'conflit') {
+        versionDistante = null;
+        majSync('encours');
+        planifierSync(600 + Math.random() * 600);
+      } else {
+        essais++;
+        majSync('erreur');
+        // on retente tout seul : vite d'abord, puis de plus en plus espacé, jusqu'à une minute
+        planifierSync(Math.min(60000, 1500 * Math.pow(2, Math.min(essais - 1, 5))));
+      }
     } finally {
       syncEnCours = false;
     }
@@ -945,83 +887,31 @@
   // ---------- Écran Enregistrement ----------
   const LIBELLES = {
     attente: 'Connexion…', encours: 'Enregistrement…', ok: 'Enregistré',
-    local: 'Non enregistré', lecture: 'À activer', horsligne: 'Hors ligne',
-    erreur: 'Erreur', conflit: 'Fusion…'
+    horsligne: 'Hors ligne', erreur: 'Reprise…'
   };
   function majSync(e) {
     etatSync = e;
     $('voyantSync').className = 'voyant ' + e;
     $('texteSync').textContent = LIBELLES[e] || e;
-    // Le bandeau reste tant que quelque chose n'est pas parti en ligne
-    const aRegler = (!jeton && e !== 'encours') || e === 'erreur' || (e === 'local' && ops.length);
-    $('alerteSync').classList.toggle('visible', !!aRegler);
-    if (e === 'erreur') {
-      $('alerteSync').querySelector('b').textContent = 'Enregistrement refusé';
-      $('alerteSync').querySelector('div').lastChild.textContent = detailSync + '.';
-    } else if (!jeton) {
-      $('alerteSync').querySelector('b').textContent = "Rien n'est enregistré en ligne";
-      $('alerteSync').querySelector('div').lastChild.textContent = 'Tes changements restent sur ce téléphone.';
-    } else {
-      $('alerteSync').querySelector('b').textContent = ops.length + ' modification(s) en attente';
-      $('alerteSync').querySelector('div').lastChild.textContent = 'Pas encore parties en ligne.';
-    }
     if ($('feuilleSync').classList.contains('ouvert')) renduSync();
   }
   function renduSync() {
-    const r = $('syncResume');
-    const enAttente = ops.length;
-    let txt = '';
+    let txt;
     if (etatSync === 'ok') txt = 'Tout est enregistré en ligne.';
     else if (etatSync === 'encours') txt = 'Enregistrement en cours…';
-    else if (etatSync === 'lecture') txt = "Aucune clé sur ce téléphone : tes changements ne partent pas en ligne.";
-    else if (etatSync === 'local') txt = enAttente + ' modification(s) gardée(s) sur ce téléphone, pas encore en ligne.';
     else if (etatSync === 'horsligne') txt = "Hors ligne. L'enregistrement reprendra au retour du réseau.";
-    else if (etatSync === 'conflit') txt = "Quelqu'un a modifié la caisse en même temps. Fusion en cours.";
-    else if (etatSync === 'erreur') txt = 'Enregistrement refusé : ' + detailSync + '.';
-    else txt = 'Connexion à GitHub…';
-    if (dernierSync) txt += ' Dernière lecture à ' + heureDe(dernierSync) + '.';
-    r.textContent = txt;
-    $('blocActiver').style.display = jeton && etatSync !== 'erreur' ? 'none' : '';
-    $('nomDepot').textContent = DEPOT.nom;
-    $('lienCle').href = 'https://github.com/settings/personal-access-tokens/new';
-    $('astuceLien').textContent = jeton
-      ? "Pour équiper un autre téléphone sans rien retaper, envoie-lui le lien d'équipe (bouton ci-dessous)."
-      : "La clé reste sur ce téléphone. Elle n'apparaît ni dans la page ni sur GitHub.";
-    $('syncPartager').style.display = jeton ? '' : 'none';
+    else if (etatSync === 'erreur') txt = 'Le réseau a refusé : ' + detailSync + '. Nouvelle tentative automatique.';
+    else txt = 'Connexion…';
+    if (ops.length) txt += ' ' + ops.length + ' modification(s) en attente.';
+    if (dernierSync) txt += ' Dernier échange à ' + heureDe(dernierSync) + '.';
+    $('syncResume').textContent = txt;
     $('syncCaisse').value = CAISSE;
-    $('syncFichier').value = DEPOT.chemin + ' · ' + FICHIER;
-    $('syncJeton').value = jeton;
   }
-  function ouvrirSync() { renduSync(); ouvrir('feuilleSync'); if (!jeton) setTimeout(() => $('syncJeton').focus(), 60); }
-  $('puceSync').addEventListener('click', ouvrirSync);
-  $('alerteActiver').addEventListener('click', ouvrirSync);
-
-  // Un lien qui installe la clé sur le téléphone suivant, sans rien retaper
-  $('syncPartager').addEventListener('click', async () => {
-    const lien = location.origin + location.pathname + '?c=' + CAISSE + '#k=' + jeton;
-    try {
-      if (navigator.share) { await navigator.share({ title: nomCaisse, url: lien }); return; }
-      await navigator.clipboard.writeText(lien);
-      toast("Lien d'équipe copié");
-    } catch (e) {
-      prompt("Copie ce lien et envoie-le à l'équipe :", lien);
-    }
-  });
+  $('puceSync').addEventListener('click', () => { renduSync(); ouvrir('feuilleSync'); });
   $('syncMaintenant').addEventListener('click', () => {
-    const v = $('syncJeton').value.trim();
-    if (v !== jeton) { jeton = v; try { localStorage.setItem(CLE_JETON, jeton); } catch (e) {} }
-    if (!jeton) { toast('Colle la clé de l\'équipe au-dessus'); $('syncJeton').focus(); return; }
-    shaDistant = null;
+    versionDistante = null;
     majSync('encours');
-    synchroniser(true).then(() => {
-      renduSync();
-      if (etatSync === 'ok') { fermerTout(); toast('Tout est enregistré en ligne'); }
-      else toast(etatSync === 'erreur' ? 'Refusé : ' + detailSync : 'Pas encore enregistré');
-    });
-  });
-  $('syncOublier').addEventListener('click', () => {
-    jeton = ''; try { localStorage.removeItem(CLE_JETON); } catch (e) {}
-    renduSync(); majSync('lecture'); toast('Clé oubliée sur ce téléphone');
+    synchroniser().then(() => { renduSync(); toast(etatSync === 'ok' ? 'À jour' : 'Réseau indisponible'); });
   });
   $('syncExport').addEventListener('click', () => {
     const contenu = JSON.stringify({ caisse: CAISSE, nom: nomCaisse, maj: new Date().toISOString(), produits, journal }, null, 1);

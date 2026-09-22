@@ -1,0 +1,33 @@
+rules_version = '2';
+
+// Regles de la base des caisses.
+//
+// Intention : celui qui scanne le QR code doit pouvoir lire ET modifier le stock
+// sans aucun reglage. L'ecriture est donc ouverte, mais strictement encadree :
+//   - uniquement sous /caisses/<identifiant>
+//   - uniquement deux champs, dont le contenu doit etre du texte
+//   - taille plafonnee, pour qu'on ne puisse pas remplir la base
+//   - identifiant de caisse court et sans fantaisie
+// Tout le reste du projet reste ferme.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /caisses/{caisse} {
+      allow read: if caisse.size() <= 40;
+
+      allow write: if caisse.size() <= 40
+                   && caisse.matches('^[a-z0-9_-]+$')
+                   && request.resource.data.keys().hasOnly(['donnees', 'maj'])
+                   && request.resource.data.donnees is string
+                   && request.resource.data.donnees.size() > 2
+                   && request.resource.data.donnees.size() <= 400000
+                   && request.resource.data.maj is string
+                   && request.resource.data.maj.size() <= 40;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

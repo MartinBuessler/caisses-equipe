@@ -1,15 +1,19 @@
 name: Sauvegarde des caisses
 
-# Deux filets de securite pour les donnees :
-#   1. une copie datee, commitee dans sauvegardes/AAAA-MM-JJ/
-#   2. une archive telechargeable, conservee 90 jours, hors de la branche
-# L'historique Git reste de toute facon la sauvegarde principale : chaque
-# modification faite depuis un telephone y est un commit restaurable.
+# Les caisses vivent dans la base Firestore du projet atelier-2sa, ou elles sont
+# ecrites a chaque changement depuis les telephones. Ce travail en ramene une copie
+# dans le depot, pour que GitHub garde un historique lisible et restaurable.
+#
+#   - toutes les 30 minutes : copie dans data/, commitee si elle a bouge
+#   - une fois par jour     : copie datee dans sauvegardes/AAAA-MM-JJ/
+#   - a chaque execution    : archive telechargeable, gardee 90 jours
+#
+# Aucun secret n'est necessaire : la base se lit publiquement, comme depuis la page.
 
 on:
   schedule:
-    - cron: "0 3 * * *"        # tous les jours a 3 h UTC
-  workflow_dispatch:            # et a la demande, depuis l'onglet Actions
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -24,37 +28,37 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Verifier que chaque caisse est un JSON valide
+      - name: Ramener les caisses depuis la base
+        run: python3 outils/tirer-caisses.py
+
+      - name: Verifier chaque caisse ramenee
         run: |
           for f in data/*.json; do
-            python3 -c "import json,sys; json.load(open(sys.argv[1], encoding='utf-8'))" "$f" \
-              || { echo "::error::$f est illisible"; exit 1; }
-            echo "ok  $f"
+            python3 outils/verifier-caisse.py "$f" || { echo "::error::$f est illisible"; exit 1; }
           done
 
-      - name: Copier les caisses dans une sauvegarde datee
+      - name: Copie datee, une fois par jour
         run: |
           JOUR=$(date -u +%Y-%m-%d)
-          mkdir -p "sauvegardes/$JOUR"
-          cp data/*.json "sauvegardes/$JOUR/"
           echo "JOUR=$JOUR" >> "$GITHUB_ENV"
-
-      - name: Ne garder que les 60 dernieres sauvegardes
-        run: |
+          if [ ! -d "sauvegardes/$JOUR" ]; then
+            mkdir -p "sauvegardes/$JOUR"
+            cp data/*.json "sauvegardes/$JOUR/"
+          fi
           ls -1d sauvegardes/*/ 2>/dev/null | sort | head -n -60 | xargs -r rm -rf
 
-      - name: Commiter la sauvegarde
+      - name: Commiter ce qui a bouge
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add sauvegardes
+          git add data sauvegardes
           git diff --cached --quiet && echo "Rien de nouveau" && exit 0
-          git commit -m "Sauvegarde des caisses du $JOUR"
+          git commit -m "Sauvegarde des caisses"
           git push
 
       - name: Archive telechargeable, conservee 90 jours
         uses: actions/upload-artifact@v4
         with:
-          name: caisses-${{ env.JOUR }}
+          name: caisses-${{ env.JOUR }}-${{ github.run_number }}
           path: data/*.json
           retention-days: 90
