@@ -1,0 +1,60 @@
+name: Sauvegarde des caisses
+
+# Deux filets de securite pour les donnees :
+#   1. une copie datee, commitee dans sauvegardes/AAAA-MM-JJ/
+#   2. une archive telechargeable, conservee 90 jours, hors de la branche
+# L'historique Git reste de toute facon la sauvegarde principale : chaque
+# modification faite depuis un telephone y est un commit restaurable.
+
+on:
+  schedule:
+    - cron: "0 3 * * *"        # tous les jours a 3 h UTC
+  workflow_dispatch:            # et a la demande, depuis l'onglet Actions
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sauvegarde
+  cancel-in-progress: false
+
+jobs:
+  sauvegarder:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verifier que chaque caisse est un JSON valide
+        run: |
+          for f in data/*.json; do
+            python3 -c "import json,sys; json.load(open(sys.argv[1], encoding='utf-8'))" "$f" \
+              || { echo "::error::$f est illisible"; exit 1; }
+            echo "ok  $f"
+          done
+
+      - name: Copier les caisses dans une sauvegarde datee
+        run: |
+          JOUR=$(date -u +%Y-%m-%d)
+          mkdir -p "sauvegardes/$JOUR"
+          cp data/*.json "sauvegardes/$JOUR/"
+          echo "JOUR=$JOUR" >> "$GITHUB_ENV"
+
+      - name: Ne garder que les 60 dernieres sauvegardes
+        run: |
+          ls -1d sauvegardes/*/ 2>/dev/null | sort | head -n -60 | xargs -r rm -rf
+
+      - name: Commiter la sauvegarde
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sauvegardes
+          git diff --cached --quiet && echo "Rien de nouveau" && exit 0
+          git commit -m "Sauvegarde des caisses du $JOUR"
+          git push
+
+      - name: Archive telechargeable, conservee 90 jours
+        uses: actions/upload-artifact@v4
+        with:
+          name: caisses-${{ env.JOUR }}
+          path: data/*.json
+          retention-days: 90

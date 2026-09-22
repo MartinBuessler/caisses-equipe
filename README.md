@@ -1,5 +1,10 @@
-# La Malle de Dorine
+# Caisses de l'équipe
 
-Inventaire des provisions de la boîte de l'équipe. Page unique, données enregistrées dans le navigateur.
+Inventaire partagé des caisses et malles. Une page unique, les données et leurs sauvegardes sur GitHub.
 
-Site : https://martinbuessler.github.io/malle-de-dorine/
+| Caisse | Adresse |
+| --- | --- |
+| Caisse Épicerie Coupe du Monde | https://martinbuessler.github.io/caisses-equipe/?c=epicerie |
+| Malle des Kinés | https://martinbuessler.github.io/caisses-equipe/?c=kine |
+
+Voir [DEPLOIEMENT.md](DEPLOIEMENT.md) pour ajouter une caisse, imprimer les QR codes et restaurer une sauvegarde.

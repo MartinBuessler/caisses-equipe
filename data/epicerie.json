@@ -1,0 +1,417 @@
+{
+ "caisse": "epicerie",
+ "nom": "Caisse Épicerie Coupe du Monde",
+ "categories": [
+  "Sucré",
+  "Salé"
+ ],
+ "maj": "2026-09-22T00:00:00.000Z",
+ "produits": [
+  {
+   "id": "p001",
+   "nom": "Barres céréales",
+   "cat": "Sucré",
+   "qte": 18,
+   "unite": "barres",
+   "date": "2027-01-20",
+   "min": 6
+  },
+  {
+   "id": "p002",
+   "nom": "Barres aux fruits",
+   "cat": "Sucré",
+   "qte": 11,
+   "unite": "barres",
+   "date": "2026-12-06",
+   "min": 4
+  },
+  {
+   "id": "p003",
+   "nom": "Barres chocolat-noisette",
+   "cat": "Sucré",
+   "qte": 3,
+   "unite": "barres",
+   "date": "2026-09-27",
+   "min": 4
+  },
+  {
+   "id": "p004",
+   "nom": "Gels énergétiques",
+   "cat": "Sucré",
+   "qte": 14,
+   "unite": "gels",
+   "date": "2027-04-10",
+   "min": 6
+  },
+  {
+   "id": "p005",
+   "nom": "Gels caféinés",
+   "cat": "Sucré",
+   "qte": 5,
+   "unite": "gels",
+   "date": "2027-03-21",
+   "min": 3
+  },
+  {
+   "id": "p006",
+   "nom": "Pâtes de fruits",
+   "cat": "Sucré",
+   "qte": 12,
+   "unite": "pièces",
+   "date": "2026-11-21",
+   "min": 4
+  },
+  {
+   "id": "p007",
+   "nom": "Compotes à boire",
+   "cat": "Sucré",
+   "qte": 7,
+   "unite": "gourdes",
+   "date": "2026-09-25",
+   "min": 4
+  },
+  {
+   "id": "p008",
+   "nom": "Compotes pomme-banane",
+   "cat": "Sucré",
+   "qte": 10,
+   "unite": "gourdes",
+   "date": "2026-11-06",
+   "min": 4
+  },
+  {
+   "id": "p009",
+   "nom": "Bananes",
+   "cat": "Sucré",
+   "qte": 4,
+   "unite": "pièces",
+   "date": "2026-09-24",
+   "min": 3
+  },
+  {
+   "id": "p010",
+   "nom": "Clémentines",
+   "cat": "Sucré",
+   "qte": 8,
+   "unite": "pièces",
+   "date": "2026-09-28",
+   "min": 4
+  },
+  {
+   "id": "p011",
+   "nom": "Amandes",
+   "cat": "Sucré",
+   "qte": 2,
+   "unite": "sachets",
+   "date": "2027-02-09",
+   "min": 1
+  },
+  {
+   "id": "p012",
+   "nom": "Abricots secs",
+   "cat": "Sucré",
+   "qte": 1,
+   "unite": "sachet",
+   "date": "2027-01-30",
+   "min": 1
+  },
+  {
+   "id": "p013",
+   "nom": "Dattes",
+   "cat": "Sucré",
+   "qte": 2,
+   "unite": "boîtes",
+   "date": "2026-09-20",
+   "min": 1
+  },
+  {
+   "id": "p014",
+   "nom": "Biscuits sablés",
+   "cat": "Sucré",
+   "qte": 6,
+   "unite": "paquets",
+   "date": "2026-12-21",
+   "min": 2
+  },
+  {
+   "id": "p015",
+   "nom": "Céréales petit-déjeuner",
+   "cat": "Sucré",
+   "qte": 2,
+   "unite": "paquets",
+   "date": "2027-02-19",
+   "min": 1
+  },
+  {
+   "id": "p016",
+   "nom": "Confiture",
+   "cat": "Sucré",
+   "qte": 3,
+   "unite": "pots",
+   "date": "2027-10-27",
+   "min": 1
+  },
+  {
+   "id": "p017",
+   "nom": "Miel",
+   "cat": "Sucré",
+   "qte": 1,
+   "unite": "pot",
+   "date": "2029-03-10",
+   "min": 1
+  },
+  {
+   "id": "p018",
+   "nom": "Pâte à tartiner",
+   "cat": "Sucré",
+   "qte": 0,
+   "unite": "pot",
+   "date": "2027-04-10",
+   "min": 1
+  },
+  {
+   "id": "p019",
+   "nom": "Chocolat noir",
+   "cat": "Sucré",
+   "qte": 4,
+   "unite": "tablettes",
+   "date": "2027-05-20",
+   "min": 2
+  },
+  {
+   "id": "p020",
+   "nom": "Chocolat en poudre",
+   "cat": "Sucré",
+   "qte": 1,
+   "unite": "boîte",
+   "date": "2027-06-29",
+   "min": 1
+  },
+  {
+   "id": "p021",
+   "nom": "Jus de fruits",
+   "cat": "Sucré",
+   "qte": 9,
+   "unite": "briquettes",
+   "date": "2027-01-10",
+   "min": 4
+  },
+  {
+   "id": "p022",
+   "nom": "Lait d'amande",
+   "cat": "Sucré",
+   "qte": 2,
+   "unite": "briques",
+   "date": "2026-09-18",
+   "min": 1
+  },
+  {
+   "id": "p023",
+   "nom": "Thon en boîte",
+   "cat": "Salé",
+   "qte": 6,
+   "unite": "boîtes",
+   "date": "2028-08-22",
+   "min": 3
+  },
+  {
+   "id": "p024",
+   "nom": "Sardines en boîte",
+   "cat": "Salé",
+   "qte": 2,
+   "unite": "boîtes",
+   "date": "2028-07-03",
+   "min": 2
+  },
+  {
+   "id": "p025",
+   "nom": "Maïs en boîte",
+   "cat": "Salé",
+   "qte": 3,
+   "unite": "boîtes",
+   "date": "2028-02-04",
+   "min": 2
+  },
+  {
+   "id": "p026",
+   "nom": "Haricots verts en boîte",
+   "cat": "Salé",
+   "qte": 2,
+   "unite": "boîtes",
+   "date": "2028-02-04",
+   "min": 2
+  },
+  {
+   "id": "p027",
+   "nom": "Riz (sachets cuisson rapide)",
+   "cat": "Salé",
+   "qte": 8,
+   "unite": "sachets",
+   "date": "2028-05-14",
+   "min": 3
+  },
+  {
+   "id": "p028",
+   "nom": "Pâtes",
+   "cat": "Salé",
+   "qte": 3,
+   "unite": "paquets",
+   "date": "2028-05-14",
+   "min": 1
+  },
+  {
+   "id": "p029",
+   "nom": "Semoule",
+   "cat": "Salé",
+   "qte": 1,
+   "unite": "paquet",
+   "date": "2027-10-27",
+   "min": 1
+  },
+  {
+   "id": "p030",
+   "nom": "Sauce tomate",
+   "cat": "Salé",
+   "qte": 4,
+   "unite": "briques",
+   "date": "2027-07-19",
+   "min": 2
+  },
+  {
+   "id": "p031",
+   "nom": "Soupe déshydratée",
+   "cat": "Salé",
+   "qte": 10,
+   "unite": "sachets",
+   "date": "2027-05-30",
+   "min": 4
+  },
+  {
+   "id": "p032",
+   "nom": "Bouillon cube",
+   "cat": "Salé",
+   "qte": 0,
+   "unite": "boîte",
+   "date": "2027-07-19",
+   "min": 1
+  },
+  {
+   "id": "p033",
+   "nom": "Galettes de riz",
+   "cat": "Salé",
+   "qte": 2,
+   "unite": "paquets",
+   "date": "2026-12-11",
+   "min": 1
+  },
+  {
+   "id": "p034",
+   "nom": "Pain de mie",
+   "cat": "Salé",
+   "qte": 1,
+   "unite": "paquet",
+   "date": "2026-09-26",
+   "min": 1
+  },
+  {
+   "id": "p035",
+   "nom": "Crackers apéritif",
+   "cat": "Salé",
+   "qte": 5,
+   "unite": "paquets",
+   "date": "2027-01-20",
+   "min": 2
+  },
+  {
+   "id": "p036",
+   "nom": "Chips",
+   "cat": "Salé",
+   "qte": 0,
+   "unite": "paquets",
+   "date": "2026-11-21",
+   "min": 2
+  },
+  {
+   "id": "p037",
+   "nom": "Cacahuètes salées",
+   "cat": "Salé",
+   "qte": 3,
+   "unite": "sachets",
+   "date": "2027-03-21",
+   "min": 2
+  },
+  {
+   "id": "p038",
+   "nom": "Jambon sec",
+   "cat": "Salé",
+   "qte": 2,
+   "unite": "paquets",
+   "date": "2026-10-12",
+   "min": 1
+  },
+  {
+   "id": "p039",
+   "nom": "Fromage à tartiner",
+   "cat": "Salé",
+   "qte": 4,
+   "unite": "portions",
+   "date": "2026-10-22",
+   "min": 2
+  },
+  {
+   "id": "p040",
+   "nom": "Œufs durs",
+   "cat": "Salé",
+   "qte": 6,
+   "unite": "pièces",
+   "date": "2026-09-29",
+   "min": 3
+  },
+  {
+   "id": "p041",
+   "nom": "Huile d'olive",
+   "cat": "Salé",
+   "qte": 1,
+   "unite": "bouteille",
+   "date": "2027-10-27",
+   "min": 1
+  },
+  {
+   "id": "p042",
+   "nom": "Sel & poivre",
+   "cat": "Salé",
+   "qte": 2,
+   "unite": "boîtes",
+   "date": "",
+   "min": 1
+  },
+  {
+   "id": "p043",
+   "nom": "Eau (bouteilles 50 cl)",
+   "cat": "Salé",
+   "qte": 12,
+   "unite": "bouteilles",
+   "date": "2028-05-14",
+   "min": 6
+  },
+  {
+   "id": "p044",
+   "nom": "Café soluble",
+   "cat": "Salé",
+   "qte": 1,
+   "unite": "pot",
+   "date": "2027-09-22",
+   "min": 1
+  },
+  {
+   "id": "p045",
+   "nom": "Thé & infusions",
+   "cat": "Salé",
+   "qte": 30,
+   "unite": "sachets",
+   "date": "2028-02-04",
+   "min": 10
+  }
+ ],
+ "journal": []
+}
