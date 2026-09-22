@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b2a5b">
-<title>La Malle de Dorine</title>
+<title>Caisse Épicerie Coupe du Monde</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230b2a5b'/%3E%3Crect x='12' y='24' width='40' height='26' rx='4' fill='%23fff'/%3E%3Crect x='12' y='18' width='40' height='10' rx='3' fill='%23d62828'/%3E%3C/svg%3E">
 <style>
   :root {
@@ -241,7 +241,7 @@
   <div class="barre-haut">
     <button class="puce" id="puceHist">Historique</button>
   </div>
-  <h1>La Malle de Dorine</h1>
+  <h1>Caisse Épicerie Coupe du Monde</h1>
   <p>Provisions de l'équipe</p>
 </header>
 
@@ -326,63 +326,58 @@
 <script>
 (function () {
   'use strict';
-  const CLE = 'malle-dorine-v2';
-  const CATEGORIES = ['Barres & gels', 'Compotes & fruits', 'Boissons', 'Repas', 'Compléments', 'Divers'];
+  const CLE = 'caisse-epicerie-v1';
+  const CATEGORIES = ["Sucré", "Salé"];
 
   const j = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
 
   function exemples() {
     return [
-      { nom: 'Barres céréales', cat: 'Barres & gels', qte: 18, unite: 'barres', date: j(120), min: 6 },
-      { nom: 'Barres protéinées', cat: 'Barres & gels', qte: 9, unite: 'barres', date: j(90), min: 4 },
-      { nom: 'Barres aux fruits', cat: 'Barres & gels', qte: 11, unite: 'barres', date: j(75), min: 4 },
-      { nom: 'Barres chocolat-noisette', cat: 'Barres & gels', qte: 3, unite: 'barres', date: j(5), min: 4 },
-      { nom: 'Gels énergétiques', cat: 'Barres & gels', qte: 14, unite: 'gels', date: j(200), min: 6 },
-      { nom: 'Gels caféinés', cat: 'Barres & gels', qte: 5, unite: 'gels', date: j(180), min: 3 },
-      { nom: 'Gels salés (électrolytes)', cat: 'Barres & gels', qte: 0, unite: 'gels', date: j(220), min: 4 },
-      { nom: 'Pâtes de fruits', cat: 'Barres & gels', qte: 12, unite: 'pièces', date: j(60), min: 4 },
-      { nom: 'Gommes énergétiques', cat: 'Barres & gels', qte: 6, unite: 'sachets', date: j(160), min: 2 },
-      { nom: 'Compotes à boire', cat: 'Compotes & fruits', qte: 7, unite: 'gourdes', date: j(3), min: 4 },
-      { nom: 'Compotes pomme-banane', cat: 'Compotes & fruits', qte: 10, unite: 'gourdes', date: j(45), min: 4 },
-      { nom: 'Bananes', cat: 'Compotes & fruits', qte: 4, unite: 'pièces', date: j(2), min: 3 },
-      { nom: 'Pommes', cat: 'Compotes & fruits', qte: 6, unite: 'pièces', date: j(9), min: 3 },
-      { nom: 'Clémentines', cat: 'Compotes & fruits', qte: 8, unite: 'pièces', date: j(6), min: 4 },
-      { nom: 'Fruits secs (mélange)', cat: 'Compotes & fruits', qte: 3, unite: 'sachets', date: j(150), min: 2 },
-      { nom: 'Amandes', cat: 'Compotes & fruits', qte: 2, unite: 'sachets', date: j(140), min: 1 },
-      { nom: 'Abricots secs', cat: 'Compotes & fruits', qte: 1, unite: 'sachet', date: j(130), min: 1 },
-      { nom: 'Dattes', cat: 'Compotes & fruits', qte: 2, unite: 'boîtes', date: j(-2), min: 1 },
-      { nom: 'Boisson isotonique (poudre)', cat: 'Boissons', qte: 2, unite: 'pots', date: j(300), min: 1 },
-      { nom: 'Sels de réhydratation', cat: 'Boissons', qte: 0, unite: 'sachets', date: j(400), min: 5 },
-      { nom: 'Lait d\'amande', cat: 'Boissons', qte: 2, unite: 'briques', date: j(-4), min: 1 },
-      { nom: 'Eau (bouteilles 50 cl)', cat: 'Boissons', qte: 12, unite: 'bouteilles', date: j(600), min: 6 },
-      { nom: 'Jus de fruits (briquettes)', cat: 'Boissons', qte: 9, unite: 'briquettes', date: j(110), min: 4 },
-      { nom: 'Boisson de récupération', cat: 'Boissons', qte: 1, unite: 'pot', date: j(250), min: 1 },
-      { nom: 'Thé & infusions', cat: 'Boissons', qte: 30, unite: 'sachets', date: j(500), min: 10 },
-      { nom: 'Café soluble', cat: 'Boissons', qte: 1, unite: 'pot', date: j(365), min: 1 },
-      { nom: 'Chocolat en poudre', cat: 'Boissons', qte: 1, unite: 'boîte', date: j(280), min: 1 },
-      { nom: 'Thon en boîte', cat: 'Repas', qte: 6, unite: 'boîtes', date: j(700), min: 3 },
-      { nom: 'Sardines en boîte', cat: 'Repas', qte: 2, unite: 'boîtes', date: j(650), min: 2 },
-      { nom: 'Riz (sachets cuisson rapide)', cat: 'Repas', qte: 8, unite: 'sachets', date: j(600), min: 3 },
-      { nom: 'Pâtes', cat: 'Repas', qte: 3, unite: 'paquets', date: j(600), min: 1 },
-      { nom: 'Semoule', cat: 'Repas', qte: 1, unite: 'paquet', date: j(400), min: 1 },
-      { nom: 'Flocons d\'avoine', cat: 'Repas', qte: 2, unite: 'paquets', date: j(300), min: 1 },
-      { nom: 'Soupe déshydratée', cat: 'Repas', qte: 10, unite: 'sachets', date: j(250), min: 4 },
-      { nom: 'Galettes de riz', cat: 'Repas', qte: 2, unite: 'paquets', date: j(80), min: 1 },
-      { nom: 'Pain de mie', cat: 'Repas', qte: 1, unite: 'paquet', date: j(4), min: 1 },
-      { nom: 'Miel', cat: 'Repas', qte: 1, unite: 'pot', date: j(900), min: 1 },
-      { nom: 'Pâte à tartiner', cat: 'Repas', qte: 0, unite: 'pot', date: j(200), min: 1 },
-      { nom: 'Chocolat noir', cat: 'Repas', qte: 4, unite: 'tablettes', date: j(240), min: 2 },
-      { nom: 'Magnésium', cat: 'Compléments', qte: 40, unite: 'comprimés', date: j(400), min: 10 },
-      { nom: 'Vitamine C', cat: 'Compléments', qte: 25, unite: 'comprimés', date: j(300), min: 10 },
-      { nom: 'Vitamine D', cat: 'Compléments', qte: 1, unite: 'flacon', date: j(350), min: 1 },
-      { nom: 'Protéine en poudre', cat: 'Compléments', qte: 1, unite: 'pot', date: j(200), min: 1 },
-      { nom: 'BCAA', cat: 'Compléments', qte: 0, unite: 'pot', date: j(300), min: 1 },
-      { nom: 'Pastilles pour la gorge', cat: 'Compléments', qte: 15, unite: 'pastilles', date: j(-10), min: 5 },
-      { nom: 'Couverts & gobelets', cat: 'Divers', qte: 20, unite: 'pièces', date: '', min: 6 },
-      { nom: 'Serviettes en papier', cat: 'Divers', qte: 1, unite: 'paquet', date: '', min: 1 },
-      { nom: 'Sacs congélation', cat: 'Divers', qte: 25, unite: 'sacs', date: '', min: 10 },
-      { nom: 'Chauffe-mains', cat: 'Divers', qte: 6, unite: 'paires', date: j(500), min: 4 },
-      { nom: 'Mouchoirs', cat: 'Divers', qte: 3, unite: 'paquets', date: '', min: 2 }
+      {"nom": "Barres céréales", "cat": "Sucré", "qte": 18, "unite": "barres", "date": j(120), "min": 6},
+      {"nom": "Barres aux fruits", "cat": "Sucré", "qte": 11, "unite": "barres", "date": j(75), "min": 4},
+      {"nom": "Barres chocolat-noisette", "cat": "Sucré", "qte": 3, "unite": "barres", "date": j(5), "min": 4},
+      {"nom": "Gels énergétiques", "cat": "Sucré", "qte": 14, "unite": "gels", "date": j(200), "min": 6},
+      {"nom": "Gels caféinés", "cat": "Sucré", "qte": 5, "unite": "gels", "date": j(180), "min": 3},
+      {"nom": "Pâtes de fruits", "cat": "Sucré", "qte": 12, "unite": "pièces", "date": j(60), "min": 4},
+      {"nom": "Compotes à boire", "cat": "Sucré", "qte": 7, "unite": "gourdes", "date": j(3), "min": 4},
+      {"nom": "Compotes pomme-banane", "cat": "Sucré", "qte": 10, "unite": "gourdes", "date": j(45), "min": 4},
+      {"nom": "Bananes", "cat": "Sucré", "qte": 4, "unite": "pièces", "date": j(2), "min": 3},
+      {"nom": "Clémentines", "cat": "Sucré", "qte": 8, "unite": "pièces", "date": j(6), "min": 4},
+      {"nom": "Amandes", "cat": "Sucré", "qte": 2, "unite": "sachets", "date": j(140), "min": 1},
+      {"nom": "Abricots secs", "cat": "Sucré", "qte": 1, "unite": "sachet", "date": j(130), "min": 1},
+      {"nom": "Dattes", "cat": "Sucré", "qte": 2, "unite": "boîtes", "date": j(-2), "min": 1},
+      {"nom": "Biscuits sablés", "cat": "Sucré", "qte": 6, "unite": "paquets", "date": j(90), "min": 2},
+      {"nom": "Céréales petit-déjeuner", "cat": "Sucré", "qte": 2, "unite": "paquets", "date": j(150), "min": 1},
+      {"nom": "Confiture", "cat": "Sucré", "qte": 3, "unite": "pots", "date": j(400), "min": 1},
+      {"nom": "Miel", "cat": "Sucré", "qte": 1, "unite": "pot", "date": j(900), "min": 1},
+      {"nom": "Pâte à tartiner", "cat": "Sucré", "qte": 0, "unite": "pot", "date": j(200), "min": 1},
+      {"nom": "Chocolat noir", "cat": "Sucré", "qte": 4, "unite": "tablettes", "date": j(240), "min": 2},
+      {"nom": "Chocolat en poudre", "cat": "Sucré", "qte": 1, "unite": "boîte", "date": j(280), "min": 1},
+      {"nom": "Jus de fruits", "cat": "Sucré", "qte": 9, "unite": "briquettes", "date": j(110), "min": 4},
+      {"nom": "Lait d'amande", "cat": "Sucré", "qte": 2, "unite": "briques", "date": j(-4), "min": 1},
+      {"nom": "Thon en boîte", "cat": "Salé", "qte": 6, "unite": "boîtes", "date": j(700), "min": 3},
+      {"nom": "Sardines en boîte", "cat": "Salé", "qte": 2, "unite": "boîtes", "date": j(650), "min": 2},
+      {"nom": "Maïs en boîte", "cat": "Salé", "qte": 3, "unite": "boîtes", "date": j(500), "min": 2},
+      {"nom": "Haricots verts en boîte", "cat": "Salé", "qte": 2, "unite": "boîtes", "date": j(500), "min": 2},
+      {"nom": "Riz (sachets cuisson rapide)", "cat": "Salé", "qte": 8, "unite": "sachets", "date": j(600), "min": 3},
+      {"nom": "Pâtes", "cat": "Salé", "qte": 3, "unite": "paquets", "date": j(600), "min": 1},
+      {"nom": "Semoule", "cat": "Salé", "qte": 1, "unite": "paquet", "date": j(400), "min": 1},
+      {"nom": "Sauce tomate", "cat": "Salé", "qte": 4, "unite": "briques", "date": j(300), "min": 2},
+      {"nom": "Soupe déshydratée", "cat": "Salé", "qte": 10, "unite": "sachets", "date": j(250), "min": 4},
+      {"nom": "Bouillon cube", "cat": "Salé", "qte": 0, "unite": "boîte", "date": j(300), "min": 1},
+      {"nom": "Galettes de riz", "cat": "Salé", "qte": 2, "unite": "paquets", "date": j(80), "min": 1},
+      {"nom": "Pain de mie", "cat": "Salé", "qte": 1, "unite": "paquet", "date": j(4), "min": 1},
+      {"nom": "Crackers apéritif", "cat": "Salé", "qte": 5, "unite": "paquets", "date": j(120), "min": 2},
+      {"nom": "Chips", "cat": "Salé", "qte": 0, "unite": "paquets", "date": j(60), "min": 2},
+      {"nom": "Cacahuètes salées", "cat": "Salé", "qte": 3, "unite": "sachets", "date": j(180), "min": 2},
+      {"nom": "Jambon sec", "cat": "Salé", "qte": 2, "unite": "paquets", "date": j(20), "min": 1},
+      {"nom": "Fromage à tartiner", "cat": "Salé", "qte": 4, "unite": "portions", "date": j(30), "min": 2},
+      {"nom": "Œufs durs", "cat": "Salé", "qte": 6, "unite": "pièces", "date": j(7), "min": 3},
+      {"nom": "Huile d'olive", "cat": "Salé", "qte": 1, "unite": "bouteille", "date": j(400), "min": 1},
+      {"nom": "Sel & poivre", "cat": "Salé", "qte": 2, "unite": "boîtes", "date": '', "min": 1},
+      {"nom": "Eau (bouteilles 50 cl)", "cat": "Salé", "qte": 12, "unite": "bouteilles", "date": j(600), "min": 6},
+      {"nom": "Café soluble", "cat": "Salé", "qte": 1, "unite": "pot", "date": j(365), "min": 1},
+      {"nom": "Thé & infusions", "cat": "Salé", "qte": 30, "unite": "sachets", "date": j(500), "min": 10}
     ].map((p, i) => ({ id: 'ex' + i + '-' + Date.now(), ...p }));
   }
 
