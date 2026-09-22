@@ -7,7 +7,7 @@ un identifiant, un fichier `data/<id>.json`, une adresse `?c=<id>`. Rien d'autre
 | --- | --- |
 | Dépôt | `MartinBuessler/caisses-equipe` |
 | Site | https://martinbuessler.github.io/caisses-equipe/ |
-| Caisses existantes | `epicerie`, `kine` |
+| Caisses existantes | `epicerie`, `kine-1`, `kine-2` |
 
 ---
 
@@ -27,20 +27,23 @@ Déjà fait sur cette machine, pour le Python `miniconda3` qui répond à `pytho
 
 ## 1. Créer la caisse d'un kiné
 
+> Les caisses existantes sont numérotées : `kine-1`, `kine-2`. La suivante est donc
+> `kine-3`. Remplace le numéro et le nom par ce que tu veux voir sur l'étiquette.
+
 Une commande, dans le dossier du projet :
 
 ```powershell
-python outils/creer-caisse.py kine-antoine --nom "Malle d'Antoine" --modele kine
+python outils/creer-caisse.py kine-3 --nom "Malle Kiné 3" --modele kine
 ```
 
-Elle écrit `data/kine-antoine.json` avec un stock de kiné crédible (strapping, soins,
+Elle écrit `data/kine-3.json` avec un stock de kiné crédible (strapping, soins,
 matériel) et inscrit la caisse dans `caisses.json`.
 
 Options utiles :
 
 ```powershell
 # une caisse vide, à remplir depuis le téléphone
-python outils/creer-caisse.py kine-lea --nom "Malle de Léa" --vide
+python outils/creer-caisse.py kine-4 --nom "Malle Kiné 4" --vide
 
 # des catégories sur mesure
 python outils/creer-caisse.py buvette --nom "Buvette" --categories "Boissons,Snacks" --vide
@@ -55,17 +58,17 @@ Trois lignes, à lancer l'une après l'autre :
 
 ```powershell
 git add -A
-git commit -m "Nouvelle caisse : Malle d'Antoine"
+git commit -m "Nouvelle caisse : Malle Kine 3"
 git push
 ```
 
 Une minute plus tard, la caisse est en ligne à l'adresse
-`https://martinbuessler.github.io/caisses-equipe/?c=kine-antoine`.
+`https://martinbuessler.github.io/caisses-equipe/?c=kine-3`.
 
 ## 3. Imprimer l'étiquette
 
 ```powershell
-python outils/generer-qr.py kine-antoine
+python outils/generer-qr.py kine-3
 ```
 
 Quatre fichiers apparaissent dans `qr/` : le QR seul en PNG et en SVG, l'étiquette A6
@@ -164,7 +167,7 @@ copy ..\caisses-equipe\data\kine*.json data\
 
 # 2. pointer le code vers le nouveau dépôt : dans index.html, bloc DEPOT,
 #    remplacer  nom: 'caisses-equipe'  par  nom: 'malles-kine'
-#    et         caisseParDefaut: 'epicerie'  par  'kine'
+#    et         caisseParDefaut: 'epicerie'  par  'kine-1'
 #    dans outils/generer-qr.py, corriger SITE de la même façon
 
 # 3. publier

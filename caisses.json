@@ -4,11 +4,11 @@
   "nom": "Caisse Épicerie Coupe du Monde"
  },
  {
-  "id": "kine",
-  "nom": "Malle des Kinés"
+  "id": "kine-1",
+  "nom": "Malle Kiné 1"
  },
  {
-  "id": "kine-antoine",
-  "nom": "Malle d'Antoine"
+  "id": "kine-2",
+  "nom": "Malle Kiné 2"
  }
 ]
