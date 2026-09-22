@@ -6,5 +6,9 @@
  {
   "id": "kine",
   "nom": "Malle des Kinés"
+ },
+ {
+  "id": "kine-antoine",
+  "nom": "Malle d'Antoine"
  }
 ]

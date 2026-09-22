@@ -11,11 +11,25 @@ un identifiant, un fichier `data/<id>.json`, une adresse `?c=<id>`. Rien d'autre
 
 ---
 
+> Les commandes ci-dessous sont écrites pour **PowerShell**, le terminal par défaut de
+> Windows. Chaque commande va sur sa propre ligne : `&&` n'y fonctionne pas. Sous Git
+> Bash ou macOS, tout marche aussi, et tu peux y enchaîner avec `&&`.
+
+## 0. Une seule fois : installer les bibliothèques
+
+Nécessaire uniquement pour générer les QR codes.
+
+```powershell
+python -m pip install "qrcode[pil]" reportlab
+```
+
+Déjà fait sur cette machine, pour le Python `miniconda3` qui répond à `python`.
+
 ## 1. Créer la caisse d'un kiné
 
 Une commande, dans le dossier du projet :
 
-```bash
+```powershell
 python outils/creer-caisse.py kine-antoine --nom "Malle d'Antoine" --modele kine
 ```
 
@@ -24,7 +38,7 @@ matériel) et inscrit la caisse dans `caisses.json`.
 
 Options utiles :
 
-```bash
+```powershell
 # une caisse vide, à remplir depuis le téléphone
 python outils/creer-caisse.py kine-lea --nom "Malle de Léa" --vide
 
@@ -37,7 +51,9 @@ de kiné affiche Strapping, Soins et Matériel. La page s'adapte à la caisse ou
 
 ## 2. Publier
 
-```bash
+Trois lignes, à lancer l'une après l'autre :
+
+```powershell
 git add -A
 git commit -m "Nouvelle caisse : Malle d'Antoine"
 git push
@@ -48,7 +64,7 @@ Une minute plus tard, la caisse est en ligne à l'adresse
 
 ## 3. Imprimer l'étiquette
 
-```bash
+```powershell
 python outils/generer-qr.py kine-antoine
 ```
 
@@ -110,16 +126,16 @@ Trois niveaux, du plus simple au plus solide :
 
 **Restaurer une journée** :
 
-```bash
+```powershell
 git pull
-cp sauvegardes/2026-09-20/epicerie.json data/epicerie.json
+copy sauvegardes\2026-09-20\epicerie.json data\epicerie.json
 git commit -am "Retour de l'epicerie au 20 septembre"
 git push
 ```
 
 **Annuler une seule bêtise**, sans tout restaurer :
 
-```bash
+```powershell
 git log --oneline -- data/epicerie.json     # repérer le commit fautif
 git revert <commit>
 git push
@@ -135,13 +151,16 @@ le téléphone, pratique avant une manipulation risquée.
 Utile si les kinés doivent gérer leurs malles sans toucher au reste, avec leurs
 propres droits. Le prix à payer : deux sites, deux clés, deux sauvegardes à surveiller.
 
-```bash
+```powershell
 # 1. nouveau dépôt à partir de celui-ci
 gh repo create malles-kine --public --clone
 cd malles-kine
-cp -r ../caisses-equipe/{index.html,outils,.github} .
-mkdir data && cp ../caisses-equipe/data/kine*.json data/
-cp ../caisses-equipe/caisses.json .
+copy ..\caisses-equipe\index.html .
+copy ..\caisses-equipe\caisses.json .
+xcopy /E /I ..\caisses-equipe\outils outils
+xcopy /E /I ..\caisses-equipe\.github .github
+mkdir data
+copy ..\caisses-equipe\data\kine*.json data\
 
 # 2. pointer le code vers le nouveau dépôt : dans index.html, bloc DEPOT,
 #    remplacer  nom: 'caisses-equipe'  par  nom: 'malles-kine'
@@ -149,9 +168,10 @@ cp ../caisses-equipe/caisses.json .
 #    dans outils/generer-qr.py, corriger SITE de la même façon
 
 # 3. publier
-git add -A && git commit -m "Malles des kinés" && git push
-gh api -X POST repos/MartinBuessler/malles-kine/pages \
-  -f "source[branch]=main" -f "source[path]=/"
+git add -A
+git commit -m "Malles des kines"
+git push
+gh api -X POST repos/MartinBuessler/malles-kine/pages -f "source[branch]=main" -f "source[path]=/"
 
 # 4. étiquettes à la nouvelle adresse
 python outils/generer-qr.py
