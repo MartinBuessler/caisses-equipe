@@ -6,7 +6,7 @@
   "Soins",
   "Matériel"
  ],
- "maj": "2026-09-22T00:00:00.000Z",
+ "maj": "2026-09-23T10:39:30.214Z",
  "produits": [
   {
    "id": "p001",
@@ -84,7 +84,7 @@
    "id": "p009",
    "nom": "Bande cohésive",
    "cat": "Strapping",
-   "qte": 0,
+   "qte": 2,
    "unite": "rouleaux",
    "date": "",
    "min": 3
@@ -252,5 +252,22 @@
    "min": 5
   }
  ],
- "journal": []
+ "journal": [
+  {
+   "id": "mudz0whu3ullv",
+   "t": 1790159969154,
+   "type": "ajoute",
+   "nom": "Bande cohésive",
+   "n": 1,
+   "apres": 2
+  },
+  {
+   "id": "mudz0o5zqpqm0",
+   "t": 1790159958359,
+   "type": "ajoute",
+   "nom": "Bande cohésive",
+   "n": 1,
+   "apres": 1
+  }
+ ]
 }
