@@ -138,10 +138,14 @@
   .evt.ajoute .delta { color: var(--vert); }
 
   .pied { text-align: center; padding: 30px 0 10px; }
+  .pied .rangee {
+    display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+  }
   .pied button {
     background: none; border: 1px solid #d9dee8; color: var(--gris); border-radius: 999px;
     padding: 8px 16px; font-size: 13px;
   }
+  .pied button.danger-txt { border-color: #f0c0c0; color: var(--rouge); }
   .pied p { font-size: 12px; color: #9aa3b2; margin: 10px 0 0; }
 
   /* ---------- Barre d'action fixe ---------- */
@@ -249,7 +253,13 @@
   <input class="recherche" id="recherche" type="search" placeholder="Rechercher un produit…" autocomplete="off">
   <div id="liste"></div>
   <div class="pied">
-    <button id="btnReset">Remettre les provisions d'exemple</button>
+    <div class="rangee">
+      <button id="btnReset">Remettre les provisions d'exemple</button>
+      <button id="btnExport">Exporter en Excel</button>
+      <button id="btnImport">Importer depuis un Excel</button>
+      <button id="btnVider" class="danger-txt">Supprimer tout l'inventaire</button>
+    </div>
+    <input type="file" id="fichierExcel" accept=".xlsx,.xls,.csv" style="display:none">
     <p>Touche un produit pour le modifier (quantité, date, seuil).</p>
   </div>
 </main>
@@ -324,11 +334,11 @@
 <!-- Mot de passe avant d'effacer l'historique -->
 <section class="feuille" id="feuilleMdp">
   <div class="feuille-tete">
-    <h2>Effacer l'historique</h2>
+    <h2 id="mdpTitre">Effacer l'historique</h2>
     <button class="fermer" data-fermer>×</button>
   </div>
   <div class="feuille-corps form">
-    <p style="font-size:13.5px;margin:0">
+    <p style="font-size:13.5px;margin:0" id="mdpTexte">
       L'historique est le journal de bord de la caisse. L'effacer supprime la trace de
       tous les mouvements, pour tout le monde. Le stock, lui, n'est pas touché.
     </p>
@@ -342,6 +352,7 @@
   <div class="feuille-pied">
     <button class="btn gris" data-fermer>Annuler</button>
     <button class="btn rouge" id="mdpValider">Effacer</button>
+    <!-- le libellé change selon l'action demandée -->
   </div>
 </section>
 
@@ -365,10 +376,15 @@
   // Catégories par défaut ; chaque caisse peut imposer les siennes dans son fichier de données
   let CATEGORIES = ["Sucré", "Salé"];
 
-  // Effacer l'historique demande un mot de passe. Seule son empreinte figure ici :
-  // lire la page ne donne pas le mot de passe. Pour le changer :
-  //   python outils/mot-de-passe.py "le nouveau"
-  const EMPREINTE_MDP = '41a87216460c929ed85e831bd396ace0a6fafa73c8ca3d959eb9f1a800e858ee';
+  // Un mot de passe par caisse, demandé avant toute action qui détruit ou remplace.
+  // Seules les empreintes figurent ici : lire la page ne donne pas les mots de passe.
+  // Pour en changer un :  python outils/mot-de-passe.py kine-1 "le nouveau"
+  const EMPREINTES_MDP = {
+    'epicerie': '0df55addf230c0040da973a7a30da952d9c107bb055314a7d3bdba3335ec099d',
+    'kine-1': '833a63294a4cb1fc9c61f2d8c3632651c7523f799d7f5c1f40fa390f66d4dd2c',
+    'kine-2': 'f751c150ca324ab493f0a9a9a84eeca7ed9d8bd6d0a54537f0794e1c9dfd0bb3',
+    '_defaut': '41a87216460c929ed85e831bd396ace0a6fafa73c8ca3d959eb9f1a800e858ee'
+  };
 
   const j = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
 
@@ -820,11 +836,142 @@
     }
   });
 
-  $('btnReset').addEventListener('click', () => {
-    if (confirm("Remplacer tout le contenu actuel par les provisions d'exemple ?")) {
-      produits = exemples();
-      enfiler({ type: 'remplacer', produits: produits.map(p => Object.assign({}, p)), evt: noter('reset', 'la caisse', 0, 0) });
-      rendu(); toast("Provisions d'exemple remises");
+  function remplacerInventaire(liste, evt) {
+    produits = liste;
+    enfiler({ type: 'remplacer', produits: produits.map(p => Object.assign({}, p)), evt });
+    rendu();
+  }
+
+  $('btnReset').addEventListener('click', () => demanderMdp(
+    "Remettre les provisions d'exemple",
+    'Tout le contenu actuel de la caisse sera remplacé par les provisions de démonstration. Les quantités notées jusque-là seront perdues.',
+    'Remettre',
+    () => { remplacerInventaire(exemples(), noter('reset', 'la caisse', 0, 0)); toast("Provisions d'exemple remises"); }));
+
+  $('btnVider').addEventListener('click', () => demanderMdp(
+    "Supprimer tout l'inventaire",
+    'Tous les produits de cette caisse seront retirés. La caisse repartira vide. L\'historique, lui, garde la trace de ce qui s\'est passé.',
+    'Supprimer',
+    () => { remplacerInventaire([], noter('vide', 'tout l\'inventaire', 0, 0)); toast('Inventaire supprimé'); }));
+
+  // ---------- Excel ----------
+  const COLONNES = ['Nom', 'Catégorie', 'Quantité', 'Unité', 'Date de péremption', 'Alerte si moins de'];
+
+  function chargerExcel() {
+    if (window.XLSX) return Promise.resolve(window.XLSX);
+    return new Promise((ok, non) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+      s.onload = () => (window.XLSX ? ok(window.XLSX) : non(new Error('bibliothèque illisible')));
+      s.onerror = () => non(new Error('bibliothèque indisponible'));
+      document.head.appendChild(s);
+    });
+  }
+
+  function telecharger(nomFichier, donnees, type) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([donnees], { type }));
+    a.download = nomFichier;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  }
+
+  function nomFichier(ext) {
+    return (nomCaisse || CAISSE).replace(/[^\wÀ-ÿ -]/g, '').trim().replace(/\s+/g, '-') +
+           '-' + new Date().toISOString().slice(0, 10) + '.' + ext;
+  }
+
+  function lignesInventaire() {
+    const ordre = {};
+    CATEGORIES.forEach((c, i) => { ordre[c] = i; });
+    return produits.slice()
+      .sort((a, b) => (ordre[a.cat] ?? 99) - (ordre[b.cat] ?? 99) || a.nom.localeCompare(b.nom, 'fr'))
+      .map(p => [p.nom, p.cat || '', p.qte, p.unite || '', p.date || '', p.min || 0]);
+    }
+
+  $('btnExport').addEventListener('click', async () => {
+    const lignes = lignesInventaire();
+    try {
+      const X = await chargerExcel();
+      const f = X.utils.aoa_to_sheet([COLONNES].concat(lignes));
+      f['!cols'] = [{ wch: 32 }, { wch: 14 }, { wch: 10 }, { wch: 14 }, { wch: 18 }, { wch: 18 }];
+      const classeur = X.utils.book_new();
+      X.utils.book_append_sheet(classeur, f, 'Inventaire');
+      X.writeFile(classeur, nomFichier('xlsx'));
+      toast('Fichier Excel enregistré');
+    } catch (e) {
+      // Sans la bibliothèque, on sort un CSV : Excel l'ouvre aussi
+      const csv = [COLONNES].concat(lignes)
+        .map(l => l.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(';')).join('\r\n');
+      telecharger(nomFichier('csv'), '﻿' + csv, 'text/csv;charset=utf-8');
+      toast('Excel indisponible, fichier CSV enregistré');
+    }
+  });
+
+  function produitsDepuisLignes(lignes) {
+    const entete = (lignes[0] || []).map(c => String(c).toLowerCase());
+    const col = (mots, defaut) => {
+      const i = entete.findIndex(c => mots.some(m => c.includes(m)));
+      return i >= 0 ? i : defaut;
+    };
+    const iNom = col(['nom', 'produit', 'article'], 0);
+    const iCat = col(['cat'], 1);
+    const iQte = col(['quant', 'qte', 'stock'], 2);
+    const iUni = col(['unit'], 3);
+    const iDat = col(['date', 'pér', 'per'], 4);
+    const iMin = col(['alerte', 'seuil', 'min'], 5);
+    const aEntete = entete.some(c => /nom|produit|article/.test(c));
+
+    const sortie = [];
+    lignes.slice(aEntete ? 1 : 0).forEach(l => {
+      const nom = String(l[iNom] === undefined ? '' : l[iNom]).trim();
+      if (!nom) return;
+      const ancien = produits.find(p => p.nom.toLowerCase() === nom.toLowerCase());
+      let date = l[iDat] === undefined ? '' : l[iDat];
+      if (date instanceof Date) date = date.toISOString().slice(0, 10);
+      else {
+        date = String(date).trim();
+        const fr = date.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+        if (fr) date = fr[3] + '-' + fr[2] + '-' + fr[1];
+        else if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) date = '';
+      }
+      const cat = String(l[iCat] === undefined ? '' : l[iCat]).trim();
+      sortie.push({
+        id: ancien ? ancien.id : 'p' + idUnique(),
+        nom,
+        cat: CATEGORIES.includes(cat) ? cat : (ancien ? ancien.cat : CATEGORIES[0]),
+        qte: Math.max(0, parseInt(l[iQte], 10) || 0),
+        unite: String(l[iUni] === undefined ? '' : l[iUni]).trim(),
+        date,
+        min: Math.max(0, parseInt(l[iMin], 10) || 0)
+      });
+    });
+    return sortie;
+  }
+
+  $('btnImport').addEventListener('click', () => demanderMdp(
+    'Importer depuis un Excel',
+    "Le fichier remplacera tout l'inventaire de cette caisse. Colonnes attendues : " +
+      COLONNES.join(', ') + '. Les produits déjà présents gardent leur historique.',
+    'Choisir le fichier',
+    () => $('fichierExcel').click()));
+
+  $('fichierExcel').addEventListener('change', async e => {
+    const f = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!f) return;
+    try {
+      const X = await chargerExcel();
+      const donnees = new Uint8Array(await f.arrayBuffer());
+      const classeur = X.read(donnees, { type: 'array', cellDates: true });
+      const feuille = classeur.Sheets[classeur.SheetNames[0]];
+      const lignes = X.utils.sheet_to_json(feuille, { header: 1, blankrows: false, raw: true });
+      const liste = produitsDepuisLignes(lignes);
+      if (!liste.length) { toast('Aucun produit lisible dans ce fichier'); return; }
+      remplacerInventaire(liste, noter('import', liste.length + ' produits', liste.length, liste.length));
+      toast(liste.length + ' produits importés');
+    } catch (err) {
+      toast('Fichier illisible : ' + (err.message || err));
     }
   });
 
@@ -885,20 +1032,26 @@
     const o = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(texte));
     return [...new Uint8Array(o)].map(b => b.toString(16).padStart(2, '0')).join('');
   }
-  $('histVider').addEventListener('click', () => {
+  // Toute action qui détruit ou remplace des données passe par ici.
+  let actionProtegee = null;
+  function demanderMdp(titre, texte, bouton, action) {
+    actionProtegee = action;
+    $('mdpTitre').textContent = titre;
+    $('mdpTexte').textContent = texte;
+    $('mdpValider').textContent = bouton;
     $('mdpSaisie').value = '';
     $('mdpErreur').style.display = 'none';
     fermerTout(); ouvrir('feuilleMdp');
     setTimeout(() => $('mdpSaisie').focus(), 60);
-  });
-  async function effacerHistorique() {
+  }
+  async function verifierMdp() {
     const saisi = $('mdpSaisie').value;
     if (!saisi) { $('mdpSaisie').focus(); return; }
     let bon = false;
     try {
-      bon = (await empreinte(saisi)) === EMPREINTE_MDP;
+      bon = (await empreinte(saisi)) === (EMPREINTES_MDP[CAISSE] || EMPREINTES_MDP._defaut);
     } catch (e) {
-      toast("Vérification impossible sur cette connexion");
+      toast('Vérification impossible sur cette connexion');
       return;
     }
     if (!bon) {
@@ -907,12 +1060,23 @@
       $('mdpSaisie').focus();
       return;
     }
-    journal = [];
-    enfiler({ type: 'videJournal', evt: { id: idUnique(), t: Date.now(), type: 'purge', nom: '', n: 0, apres: 0 } });
-    fermerTout(); rendu(); toast('Historique effacé');
+    const faire = actionProtegee;
+    actionProtegee = null;
+    fermerTout();
+    if (faire) faire();
   }
-  $('mdpValider').addEventListener('click', effacerHistorique);
-  $('mdpSaisie').addEventListener('keydown', e => { if (e.key === 'Enter') effacerHistorique(); });
+  $('mdpValider').addEventListener('click', verifierMdp);
+  $('mdpSaisie').addEventListener('keydown', e => { if (e.key === 'Enter') verifierMdp(); });
+
+  $('histVider').addEventListener('click', () => demanderMdp(
+    "Effacer l'historique",
+    "L'historique est le journal de bord de la caisse. L'effacer supprime la trace de tous les mouvements, pour tout le monde. Le stock, lui, n'est pas touché.",
+    'Effacer',
+    () => {
+      journal = [];
+      enfiler({ type: 'videJournal', evt: { id: idUnique(), t: Date.now(), type: 'purge', nom: '', n: 0, apres: 0 } });
+      rendu(); toast('Historique effacé');
+    }));
 
   // ---------- Écran Enregistrement ----------
   // L'enregistrement n'a plus d'écran : il se fait seul et se relit dans l'Historique.
