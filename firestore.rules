@@ -14,7 +14,9 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     match /caisses/{caisse} {
-      allow read: if caisse.size() <= 40;
+      // lecture ouverte : le stock n'a rien de confidentiel, et la sauvegarde
+      // automatique a besoin de parcourir la collection entiere
+      allow read: if true;
 
       allow write: if caisse.size() <= 40
                    && caisse.matches('^[a-z0-9_-]+$')

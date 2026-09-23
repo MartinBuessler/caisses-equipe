@@ -49,15 +49,8 @@
     background: linear-gradient(90deg, var(--bleu) 0 33.3%, #fff 33.3% 66.6%, var(--rouge) 66.6% 100%);
   }
   .barre-haut {
-    display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-bottom: 10px;
   }
-  .voyant {
-    width: 9px; height: 9px; border-radius: 50%; background: var(--gris); flex-shrink: 0;
-  }
-  .voyant.ok { background: #3ddc84; }
-  .voyant.encours { background: #ffd166; }
-  .voyant.local, .voyant.horsligne { background: var(--orange); }
-  .voyant.erreur, .voyant.conflit { background: #ff6b6b; }
   .puce {
     background: rgba(255,255,255,.16); border: none; color: #fff; border-radius: 999px;
     padding: 7px 13px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px;
@@ -246,7 +239,6 @@
 
 <header>
   <div class="barre-haut">
-    <button class="puce" id="puceSync"><span class="voyant" id="voyantSync"></span><span id="texteSync">Connexion…</span></button>
     <button class="puce" id="puceHist">Historique</button>
   </div>
   <h1 id="titre">Caisse Épicerie Coupe du Monde</h1>
@@ -328,27 +320,6 @@
   </div>
 </section>
 
-
-<!-- Feuille Synchronisation -->
-<section class="feuille" id="feuilleSync">
-  <div class="feuille-tete">
-    <h2>Enregistrement</h2>
-    <button class="fermer" data-fermer>×</button>
-  </div>
-  <div class="feuille-corps form">
-    <div class="recap actif" id="syncResume">…</div>
-    <p style="font-size:13.5px;margin:0">
-      Cette caisse est enregistrée en ligne automatiquement, à chaque changement.
-      Tout le monde voit le même stock, il n'y a rien à régler.
-    </p>
-    <label>Caisse</label>
-    <input id="syncCaisse" type="text" readonly>
-  </div>
-  <div class="feuille-pied">
-    <button class="btn gris" id="syncExport">Exporter</button>
-    <button class="btn bleu" id="syncMaintenant">Actualiser</button>
-  </div>
-</section>
 
 <div class="toast" id="toast"></div>
 
@@ -885,42 +856,10 @@
   });
 
   // ---------- Écran Enregistrement ----------
-  const LIBELLES = {
-    attente: 'Connexion…', encours: 'Enregistrement…', ok: 'Enregistré',
-    horsligne: 'Hors ligne', erreur: 'Reprise…'
-  };
-  function majSync(e) {
-    etatSync = e;
-    $('voyantSync').className = 'voyant ' + e;
-    $('texteSync').textContent = LIBELLES[e] || e;
-    if ($('feuilleSync').classList.contains('ouvert')) renduSync();
-  }
-  function renduSync() {
-    let txt;
-    if (etatSync === 'ok') txt = 'Tout est enregistré en ligne.';
-    else if (etatSync === 'encours') txt = 'Enregistrement en cours…';
-    else if (etatSync === 'horsligne') txt = "Hors ligne. L'enregistrement reprendra au retour du réseau.";
-    else if (etatSync === 'erreur') txt = 'Le réseau a refusé : ' + detailSync + '. Nouvelle tentative automatique.';
-    else txt = 'Connexion…';
-    if (ops.length) txt += ' ' + ops.length + ' modification(s) en attente.';
-    if (dernierSync) txt += ' Dernier échange à ' + heureDe(dernierSync) + '.';
-    $('syncResume').textContent = txt;
-    $('syncCaisse').value = CAISSE;
-  }
-  $('puceSync').addEventListener('click', () => { renduSync(); ouvrir('feuilleSync'); });
-  $('syncMaintenant').addEventListener('click', () => {
-    versionDistante = null;
-    majSync('encours');
-    synchroniser().then(() => { renduSync(); toast(etatSync === 'ok' ? 'À jour' : 'Réseau indisponible'); });
-  });
-  $('syncExport').addEventListener('click', () => {
-    const contenu = JSON.stringify({ caisse: CAISSE, nom: nomCaisse, maj: new Date().toISOString(), produits, journal }, null, 1);
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([contenu], { type: 'application/json' }));
-    a.download = CAISSE + '-' + new Date().toISOString().slice(0, 10) + '.json';
-    document.body.appendChild(a); a.click(); a.remove();
-    toast('Fichier exporté');
-  });
+  // L'enregistrement n'a plus d'écran : il se fait seul et se relit dans l'Historique.
+  // majSync ne sert plus qu'à savoir s'il faut réessayer.
+  function majSync(e) { etatSync = e; }
+
   window.addEventListener('online', () => planifierSync(500));
   window.addEventListener('offline', () => majSync('horsligne'));
   document.addEventListener('visibilitychange', () => { if (!document.hidden) planifierSync(500); });
