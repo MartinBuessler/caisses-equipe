@@ -5,7 +5,7 @@
   "Sucré",
   "Salé"
  ],
- "maj": "2026-09-22T00:00:00.000Z",
+ "maj": "2026-09-23T10:37:45.463Z",
  "produits": [
   {
    "id": "p001",
@@ -413,5 +413,22 @@
    "min": 10
   }
  ],
- "journal": []
+ "journal": [
+  {
+   "id": "mudyynmul82qs",
+   "t": 1790159864358,
+   "type": "pris",
+   "nom": "Chips",
+   "n": 1,
+   "apres": 0
+  },
+  {
+   "id": "mudyyhadt348d",
+   "t": 1790159856133,
+   "type": "ajoute",
+   "nom": "Chips",
+   "n": 1,
+   "apres": 1
+  }
+ ]
 }
