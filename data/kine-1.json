@@ -6,7 +6,7 @@
   "Soins",
   "Matériel"
  ],
- "maj": "2026-09-23T10:39:30.214Z",
+ "maj": "2026-09-23T20:15:43.947Z",
  "produits": [
   {
    "id": "p001",
@@ -48,7 +48,7 @@
    "id": "p005",
    "nom": "K-tape",
    "cat": "Strapping",
-   "qte": 6,
+   "qte": 3,
    "unite": "rouleaux",
    "date": "",
    "min": 2
@@ -268,6 +268,38 @@
    "nom": "Bande cohésive",
    "n": 1,
    "apres": 1
+  },
+  {
+   "id": "mucwcr5tet6hh",
+   "t": 1790095018372,
+   "type": "pris",
+   "nom": "K-tape",
+   "n": 3,
+   "apres": 3
+  },
+  {
+   "id": "mucwcqgsrfaxz",
+   "t": 1790095016188,
+   "type": "ajoute",
+   "nom": "Ciseaux à bandes",
+   "n": 1,
+   "apres": 3
+  },
+  {
+   "id": "mucwcp2a5xtxj",
+   "t": 1790095015187,
+   "type": "pris",
+   "nom": "Ciseaux à bandes",
+   "n": 2,
+   "apres": 2
+  },
+  {
+   "id": "mucwcoailamuj",
+   "t": 1790095013370,
+   "type": "ajoute",
+   "nom": "Ciseaux à bandes",
+   "n": 1,
+   "apres": 4
   }
  ]
 }
