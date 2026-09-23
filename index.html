@@ -321,6 +321,30 @@
 </section>
 
 
+<!-- Mot de passe avant d'effacer l'historique -->
+<section class="feuille" id="feuilleMdp">
+  <div class="feuille-tete">
+    <h2>Effacer l'historique</h2>
+    <button class="fermer" data-fermer>×</button>
+  </div>
+  <div class="feuille-corps form">
+    <p style="font-size:13.5px;margin:0">
+      L'historique est le journal de bord de la caisse. L'effacer supprime la trace de
+      tous les mouvements, pour tout le monde. Le stock, lui, n'est pas touché.
+    </p>
+    <label>Mot de passe</label>
+    <input id="mdpSaisie" type="password" autocomplete="off" autocapitalize="off"
+           autocorrect="off" spellcheck="false" placeholder="••••••••">
+    <p id="mdpErreur" style="font-size:13px;color:var(--rouge);font-weight:700;margin:8px 0 0;display:none">
+      Mot de passe incorrect.
+    </p>
+  </div>
+  <div class="feuille-pied">
+    <button class="btn gris" data-fermer>Annuler</button>
+    <button class="btn rouge" id="mdpValider">Effacer</button>
+  </div>
+</section>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -340,6 +364,11 @@
 
   // Catégories par défaut ; chaque caisse peut imposer les siennes dans son fichier de données
   let CATEGORIES = ["Sucré", "Salé"];
+
+  // Effacer l'historique demande un mot de passe. Seule son empreinte figure ici :
+  // lire la page ne donne pas le mot de passe. Pour le changer :
+  //   python outils/mot-de-passe.py "le nouveau"
+  const EMPREINTE_MDP = '41a87216460c929ed85e831bd396ace0a6fafa73c8ca3d959eb9f1a800e858ee';
 
   const j = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
 
@@ -447,6 +476,8 @@
       etat.produits = etat.produits.filter(x => x.id !== op.prod);
     } else if (op.type === 'remplacer') {
       etat.produits = op.produits.map(x => Object.assign({}, x));
+    } else if (op.type === 'videJournal') {
+      etat.journal = [];
     }
     if (op.evt && !etat.journal.some(e => e.id === op.evt.id)) {
       etat.journal.push(Object.assign({}, op.evt));
@@ -800,7 +831,8 @@
   // ---------- Écran Historique ----------
   const VERBES = {
     pris: ['Pris', 'pris'], ajoute: ['Rangé', 'ajoute'], cree: ['Créé', 'cree'],
-    modifie: ['Modifié', 'modifie'], supprime: ['Supprimé', 'supprime'], reset: ['Réinitialisée', 'supprime']
+    modifie: ['Modifié', 'modifie'], supprime: ['Supprimé', 'supprime'], reset: ['Réinitialisée', 'supprime'],
+    purge: ['Historique effacé', 'supprime']
   };
   function heureDe(t) {
     const d = new Date(t);
@@ -848,12 +880,39 @@
     });
   }
   $('puceHist').addEventListener('click', () => { renduHist(); ouvrir('feuilleHist'); });
+  // ---------- Effacement protégé par mot de passe ----------
+  async function empreinte(texte) {
+    const o = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(texte));
+    return [...new Uint8Array(o)].map(b => b.toString(16).padStart(2, '0')).join('');
+  }
   $('histVider').addEventListener('click', () => {
-    if (confirm("Effacer tout l'historique ? Le stock n'est pas touché.")) {
-      journal = []; try { localStorage.setItem(CLE_HIST, '[]'); } catch (e) {}
-      renduHist(); toast('Historique effacé');
-    }
+    $('mdpSaisie').value = '';
+    $('mdpErreur').style.display = 'none';
+    fermerTout(); ouvrir('feuilleMdp');
+    setTimeout(() => $('mdpSaisie').focus(), 60);
   });
+  async function effacerHistorique() {
+    const saisi = $('mdpSaisie').value;
+    if (!saisi) { $('mdpSaisie').focus(); return; }
+    let bon = false;
+    try {
+      bon = (await empreinte(saisi)) === EMPREINTE_MDP;
+    } catch (e) {
+      toast("Vérification impossible sur cette connexion");
+      return;
+    }
+    if (!bon) {
+      $('mdpErreur').style.display = '';
+      $('mdpSaisie').value = '';
+      $('mdpSaisie').focus();
+      return;
+    }
+    journal = [];
+    enfiler({ type: 'videJournal', evt: { id: idUnique(), t: Date.now(), type: 'purge', nom: '', n: 0, apres: 0 } });
+    fermerTout(); rendu(); toast('Historique effacé');
+  }
+  $('mdpValider').addEventListener('click', effacerHistorique);
+  $('mdpSaisie').addEventListener('keydown', e => { if (e.key === 'Enter') effacerHistorique(); });
 
   // ---------- Écran Enregistrement ----------
   // L'enregistrement n'a plus d'écran : il se fait seul et se relit dans l'Historique.
