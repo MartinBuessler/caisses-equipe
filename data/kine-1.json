@@ -6,7 +6,7 @@
   "Soins",
   "Matériel"
  ],
- "maj": "2026-09-23T20:15:43.947Z",
+ "maj": "2026-09-24T07:14:51.182Z",
  "produits": [
   {
    "id": "p001",
@@ -57,7 +57,7 @@
    "id": "p006",
    "nom": "Sous-bande mousse",
    "cat": "Strapping",
-   "qte": 9,
+   "qte": 7,
    "unite": "rouleaux",
    "date": "",
    "min": 3
@@ -253,6 +253,30 @@
   }
  ],
  "journal": [
+  {
+   "id": "muf75kmdxts97",
+   "t": 1790234090149,
+   "type": "pris",
+   "nom": "Sous-bande mousse",
+   "n": 1,
+   "apres": 7
+  },
+  {
+   "id": "muf75j6hb2o8p",
+   "t": 1790234088446,
+   "type": "pris",
+   "nom": "Sous-bande mousse",
+   "n": 2,
+   "apres": 8
+  },
+  {
+   "id": "muf75iv9dudn4",
+   "t": 1790234087877,
+   "type": "ajoute",
+   "nom": "Sous-bande mousse",
+   "n": 1,
+   "apres": 10
+  },
   {
    "id": "mudz0whu3ullv",
    "t": 1790159969154,
