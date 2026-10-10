@@ -1,0 +1,256 @@
+{
+ "caisse": "kine-2",
+ "nom": "Malle Kiné 2",
+ "categories": [
+  "Strapping",
+  "Soins",
+  "Matériel"
+ ],
+ "maj": "2026-09-22T00:00:00.000Z",
+ "produits": [
+  {
+   "id": "p001",
+   "nom": "Bande élastique 6 cm",
+   "cat": "Strapping",
+   "qte": 12,
+   "unite": "rouleaux",
+   "date": "",
+   "min": 4
+  },
+  {
+   "id": "p002",
+   "nom": "Bande élastique 8 cm",
+   "cat": "Strapping",
+   "qte": 8,
+   "unite": "rouleaux",
+   "date": "",
+   "min": 3
+  },
+  {
+   "id": "p003",
+   "nom": "Tape rigide 3,8 cm",
+   "cat": "Strapping",
+   "qte": 10,
+   "unite": "rouleaux",
+   "date": "",
+   "min": 4
+  },
+  {
+   "id": "p004",
+   "nom": "Tape rigide 2,5 cm",
+   "cat": "Strapping",
+   "qte": 4,
+   "unite": "rouleaux",
+   "date": "",
+   "min": 4
+  },
+  {
+   "id": "p005",
+   "nom": "K-tape",
+   "cat": "Strapping",
+   "qte": 6,
+   "unite": "rouleaux",
+   "date": "",
+   "min": 2
+  },
+  {
+   "id": "p006",
+   "nom": "Sous-bande mousse",
+   "cat": "Strapping",
+   "qte": 9,
+   "unite": "rouleaux",
+   "date": "",
+   "min": 3
+  },
+  {
+   "id": "p007",
+   "nom": "Spray adhérent",
+   "cat": "Strapping",
+   "qte": 2,
+   "unite": "aérosols",
+   "date": "2027-10-27",
+   "min": 1
+  },
+  {
+   "id": "p008",
+   "nom": "Ciseaux à bandes",
+   "cat": "Strapping",
+   "qte": 3,
+   "unite": "paires",
+   "date": "",
+   "min": 2
+  },
+  {
+   "id": "p009",
+   "nom": "Bande cohésive",
+   "cat": "Strapping",
+   "qte": 0,
+   "unite": "rouleaux",
+   "date": "",
+   "min": 3
+  },
+  {
+   "id": "p010",
+   "nom": "Crème de massage",
+   "cat": "Soins",
+   "qte": 4,
+   "unite": "tubes",
+   "date": "2027-07-19",
+   "min": 2
+  },
+  {
+   "id": "p011",
+   "nom": "Huile de massage",
+   "cat": "Soins",
+   "qte": 2,
+   "unite": "flacons",
+   "date": "2027-05-30",
+   "min": 1
+  },
+  {
+   "id": "p012",
+   "nom": "Gel chauffant",
+   "cat": "Soins",
+   "qte": 3,
+   "unite": "tubes",
+   "date": "2027-03-21",
+   "min": 1
+  },
+  {
+   "id": "p013",
+   "nom": "Gel froid",
+   "cat": "Soins",
+   "qte": 1,
+   "unite": "tube",
+   "date": "2026-09-27",
+   "min": 2
+  },
+  {
+   "id": "p014",
+   "nom": "Poches de froid instantané",
+   "cat": "Soins",
+   "qte": 6,
+   "unite": "poches",
+   "date": "2028-02-04",
+   "min": 4
+  },
+  {
+   "id": "p015",
+   "nom": "Arnica",
+   "cat": "Soins",
+   "qte": 2,
+   "unite": "tubes",
+   "date": "2026-09-12",
+   "min": 1
+  },
+  {
+   "id": "p016",
+   "nom": "Compresses stériles",
+   "cat": "Soins",
+   "qte": 20,
+   "unite": "sachets",
+   "date": "2028-05-14",
+   "min": 8
+  },
+  {
+   "id": "p017",
+   "nom": "Désinfectant cutané",
+   "cat": "Soins",
+   "qte": 1,
+   "unite": "flacon",
+   "date": "2027-01-20",
+   "min": 1
+  },
+  {
+   "id": "p018",
+   "nom": "Pansements",
+   "cat": "Soins",
+   "qte": 30,
+   "unite": "pièces",
+   "date": "2028-08-22",
+   "min": 10
+  },
+  {
+   "id": "p019",
+   "nom": "Steri-strips",
+   "cat": "Soins",
+   "qte": 0,
+   "unite": "sachets",
+   "date": "2027-10-27",
+   "min": 3
+  },
+  {
+   "id": "p020",
+   "nom": "Sérum physiologique",
+   "cat": "Soins",
+   "qte": 8,
+   "unite": "dosettes",
+   "date": "2026-12-21",
+   "min": 4
+  },
+  {
+   "id": "p021",
+   "nom": "Gants jetables",
+   "cat": "Matériel",
+   "qte": 40,
+   "unite": "paires",
+   "date": "",
+   "min": 15
+  },
+  {
+   "id": "p022",
+   "nom": "Élastiques de rééducation",
+   "cat": "Matériel",
+   "qte": 5,
+   "unite": "bandes",
+   "date": "",
+   "min": 2
+  },
+  {
+   "id": "p023",
+   "nom": "Balles de massage",
+   "cat": "Matériel",
+   "qte": 4,
+   "unite": "pièces",
+   "date": "",
+   "min": 2
+  },
+  {
+   "id": "p024",
+   "nom": "Rouleau de massage",
+   "cat": "Matériel",
+   "qte": 1,
+   "unite": "pièce",
+   "date": "",
+   "min": 1
+  },
+  {
+   "id": "p025",
+   "nom": "Électrodes",
+   "cat": "Matériel",
+   "qte": 2,
+   "unite": "sachets",
+   "date": "2027-04-10",
+   "min": 2
+  },
+  {
+   "id": "p026",
+   "nom": "Thermomètre",
+   "cat": "Matériel",
+   "qte": 1,
+   "unite": "pièce",
+   "date": "",
+   "min": 1
+  },
+  {
+   "id": "p027",
+   "nom": "Sacs poubelle",
+   "cat": "Matériel",
+   "qte": 10,
+   "unite": "sacs",
+   "date": "",
+   "min": 5
+  }
+ ],
+ "journal": []
+}
