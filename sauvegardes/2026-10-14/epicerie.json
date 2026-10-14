@@ -1,0 +1,721 @@
+{
+ "caisse": "epicerie",
+ "nom": "Caisse Épicerie Coupe du Monde",
+ "categories": [
+  "Sucré",
+  "Salé"
+ ],
+ "maj": "2026-09-24T07:41:52.957Z",
+ "produits": [
+  {
+   "id": "p003",
+   "nom": "Céréales crunchy",
+   "cat": "Sucré",
+   "qte": 3,
+   "unite": "Sac",
+   "date": "2026-12-26",
+   "min": 0
+  },
+  {
+   "id": "p007",
+   "nom": "Amandes",
+   "cat": "Sucré",
+   "qte": 7,
+   "unite": "Sac",
+   "date": "2026-12-27",
+   "min": 1
+  },
+  {
+   "id": "p008",
+   "nom": "Compotes pomme-banane",
+   "cat": "Sucré",
+   "qte": 10,
+   "unite": "gourdes",
+   "date": "2026-11-06",
+   "min": 4
+  },
+  {
+   "id": "p010",
+   "nom": "Flocons avoines",
+   "cat": "Sucré",
+   "qte": 8,
+   "unite": "Sac",
+   "date": "2026-12-26",
+   "min": 1
+  },
+  {
+   "id": "p012",
+   "nom": "Galettes sans gluten",
+   "cat": "Sucré",
+   "qte": 2,
+   "unite": "sachet",
+   "date": "2027-01-30",
+   "min": 1
+  },
+  {
+   "id": "p013",
+   "nom": "Beurres cacahuètes",
+   "cat": "Sucré",
+   "qte": 2,
+   "unite": "Bocal",
+   "date": "2026-12-26",
+   "min": 1
+  },
+  {
+   "id": "p017",
+   "nom": "Miel",
+   "cat": "Sucré",
+   "qte": 1,
+   "unite": "pot",
+   "date": "2029-03-10",
+   "min": 0
+  },
+  {
+   "id": "p018",
+   "nom": "Pâte à tartiner",
+   "cat": "Sucré",
+   "qte": 1,
+   "unite": "pot",
+   "date": "2027-04-10",
+   "min": 0
+  },
+  {
+   "id": "p019",
+   "nom": "Chocolat noir",
+   "cat": "Sucré",
+   "qte": 4,
+   "unite": "tablettes",
+   "date": "2027-05-20",
+   "min": 2
+  },
+  {
+   "id": "p020",
+   "nom": "Chocolat en poudre",
+   "cat": "Sucré",
+   "qte": 1,
+   "unite": "boîte",
+   "date": "2027-06-29",
+   "min": 0
+  },
+  {
+   "id": "p022",
+   "nom": "Confiture",
+   "cat": "Sucré",
+   "qte": 2,
+   "unite": "Pots",
+   "date": "2026-12-26",
+   "min": 1
+  },
+  {
+   "id": "p023",
+   "nom": "Thon en boîte",
+   "cat": "Salé",
+   "qte": 6,
+   "unite": "boîtes",
+   "date": "2028-08-22",
+   "min": 3
+  },
+  {
+   "id": "p024",
+   "nom": "Sardines en boîte",
+   "cat": "Salé",
+   "qte": 3,
+   "unite": "boîtes",
+   "date": "2028-07-03",
+   "min": 2
+  },
+  {
+   "id": "p027",
+   "nom": "Riz (sachets cuisson rapide)",
+   "cat": "Salé",
+   "qte": 8,
+   "unite": "sachets",
+   "date": "2028-05-14",
+   "min": 3
+  },
+  {
+   "id": "p034",
+   "nom": "Huile lin",
+   "cat": "Salé",
+   "qte": 1,
+   "unite": "Bouteille",
+   "date": "2026-12-27",
+   "min": 0
+  },
+  {
+   "id": "p035",
+   "nom": "Crackers apéritif",
+   "cat": "Salé",
+   "qte": 5,
+   "unite": "paquets",
+   "date": "2027-01-20",
+   "min": 2
+  },
+  {
+   "id": "p036",
+   "nom": "Pois chiche grillés",
+   "cat": "Salé",
+   "qte": 1,
+   "unite": "paquets",
+   "date": "2026-11-21",
+   "min": 0
+  },
+  {
+   "id": "p044",
+   "nom": "Maquereaux",
+   "cat": "Salé",
+   "qte": 2,
+   "unite": "Boite",
+   "date": "2027-09-22",
+   "min": 1
+  }
+ ],
+ "journal": [
+  {
+   "id": "muf84b0yvpkvv",
+   "t": 1790235710674,
+   "type": "supprime",
+   "nom": "Bouillon cube",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf83y1852q8c",
+   "t": 1790235693836,
+   "type": "ajoute",
+   "nom": "Maquereaux",
+   "n": 1,
+   "apres": 2
+  },
+  {
+   "id": "muf834y71hsgh",
+   "t": 1790235656143,
+   "type": "modifie",
+   "nom": "Maquereaux",
+   "n": 0,
+   "apres": 1
+  },
+  {
+   "id": "muf8310umfmd5",
+   "t": 1790235651054,
+   "type": "modifie",
+   "nom": "Huile lin",
+   "n": 0,
+   "apres": 1
+  },
+  {
+   "id": "muf82v11nuosl",
+   "t": 1790235643285,
+   "type": "modifie",
+   "nom": "Huile lin",
+   "n": 0,
+   "apres": 1,
+   "ancien": "Pain de mie"
+  },
+  {
+   "id": "muf82brl6gpbz",
+   "t": 1790235618321,
+   "type": "ajoute",
+   "nom": "Sardines en boîte",
+   "n": 1,
+   "apres": 3
+  },
+  {
+   "id": "muf82158suhga",
+   "t": 1790235604556,
+   "type": "ajoute",
+   "nom": "Pois chiche grillés",
+   "n": 1,
+   "apres": 1
+  },
+  {
+   "id": "muf82056sohux",
+   "t": 1790235603258,
+   "type": "modifie",
+   "nom": "Pois chiche grillés",
+   "n": 0,
+   "apres": 0,
+   "ancien": "Chips"
+  },
+  {
+   "id": "muf81nhzdygfo",
+   "t": 1790235586871,
+   "type": "supprime",
+   "nom": "Œufs durs",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf81b0j3i4gp",
+   "t": 1790235570691,
+   "type": "modifie",
+   "nom": "Maquereaux",
+   "n": 0,
+   "apres": 1,
+   "ancien": "Café soluble"
+  },
+  {
+   "id": "muf80wit0j90h",
+   "t": 1790235551909,
+   "type": "supprime",
+   "nom": "Haricots verts en boîte",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf80snbipw45",
+   "t": 1790235546887,
+   "type": "supprime",
+   "nom": "Huile d'olive",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf80pr1swja3",
+   "t": 1790235543133,
+   "type": "supprime",
+   "nom": "Semoule",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf80m8i6utm5",
+   "t": 1790235538578,
+   "type": "supprime",
+   "nom": "Cacahuètes salées",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf80jbr1gep5",
+   "t": 1790235534807,
+   "type": "supprime",
+   "nom": "Eau (bouteilles 50 cl)",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf80h93wc6kv",
+   "t": 1790235532119,
+   "type": "supprime",
+   "nom": "Fromage à tartiner",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf80eq8wp62z",
+   "t": 1790235528848,
+   "type": "supprime",
+   "nom": "Galettes de riz",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf80d06sudai",
+   "t": 1790235526614,
+   "type": "supprime",
+   "nom": "Jambon sec",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf80aharg34f",
+   "t": 1790235523343,
+   "type": "supprime",
+   "nom": "Maïs en boîte",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf803xi6litv",
+   "t": 1790235514854,
+   "type": "supprime",
+   "nom": "Pâtes",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf7zutgphwpy",
+   "t": 1790235503044,
+   "type": "supprime",
+   "nom": "Sauce tomate",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf7zshh7vf1n",
+   "t": 1790235500021,
+   "type": "supprime",
+   "nom": "Sel & poivre",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf7zq9adkqq4",
+   "t": 1790235497134,
+   "type": "supprime",
+   "nom": "Soupe déshydratée",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf7zo0aqul0k",
+   "t": 1790235494218,
+   "type": "supprime",
+   "nom": "Thé & infusions",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf7ziyvx027m",
+   "t": 1790235487687,
+   "type": "modifie",
+   "nom": "Thon en boîte",
+   "n": 0,
+   "apres": 6
+  },
+  {
+   "id": "muf7ygzu634fi",
+   "t": 1790235438474,
+   "type": "supprime",
+   "nom": "Barres aux fruits",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf7xykydbolc",
+   "t": 1790235414610,
+   "type": "modifie",
+   "nom": "Beurres cacahuètes",
+   "n": 0,
+   "apres": 2
+  },
+  {
+   "id": "muf7xsv5gs6vp",
+   "t": 1790235407201,
+   "type": "modifie",
+   "nom": "Confiture",
+   "n": 0,
+   "apres": 2
+  },
+  {
+   "id": "muf7xl2rwdz6w",
+   "t": 1790235397107,
+   "type": "modifie",
+   "nom": "Pâte à tartiner",
+   "n": 0,
+   "apres": 1
+  },
+  {
+   "id": "muf7xhceeozkv",
+   "t": 1790235392270,
+   "type": "ajoute",
+   "nom": "Pâte à tartiner",
+   "n": 1,
+   "apres": 1
+  },
+  {
+   "id": "muf7xdaspgw75",
+   "t": 1790235387028,
+   "type": "modifie",
+   "nom": "Amandes",
+   "n": 0,
+   "apres": 7
+  },
+  {
+   "id": "muf7x69qvenh0",
+   "t": 1790235377918,
+   "type": "modifie",
+   "nom": "Céréales crunchy",
+   "n": 0,
+   "apres": 3
+  },
+  {
+   "id": "muf7x169kajk7",
+   "t": 1790235371313,
+   "type": "modifie",
+   "nom": "Céréales crunchy",
+   "n": 0,
+   "apres": 3
+  },
+  {
+   "id": "muf7wurwomj2c",
+   "t": 1790235363020,
+   "type": "modifie",
+   "nom": "Flocons avoines",
+   "n": 0,
+   "apres": 8
+  },
+  {
+   "id": "muf7w9diivm1s",
+   "t": 1790235335286,
+   "type": "modifie",
+   "nom": "Chocolat en poudre",
+   "n": 0,
+   "apres": 1
+  },
+  {
+   "id": "muf7w658nygdf",
+   "t": 1790235331100,
+   "type": "ajoute",
+   "nom": "Galettes sans gluten",
+   "n": 1,
+   "apres": 2
+  },
+  {
+   "id": "muf7vubdlhii2",
+   "t": 1790235315769,
+   "type": "modifie",
+   "nom": "Galettes sans gluten",
+   "n": 0,
+   "apres": 1
+  },
+  {
+   "id": "muf7vnu9gaeig",
+   "t": 1790235307377,
+   "type": "modifie",
+   "nom": "Galettes sans gluten",
+   "n": 0,
+   "apres": 1
+  },
+  {
+   "id": "muf7vcv0vjmrj",
+   "t": 1790235293148,
+   "type": "supprime",
+   "nom": "Miel",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf7v41gj1gy4",
+   "t": 1790235281716,
+   "type": "modifie",
+   "nom": "Miel",
+   "n": 0,
+   "apres": 1
+  },
+  {
+   "id": "muf7uytc8flj1",
+   "t": 1790235274944,
+   "type": "supprime",
+   "nom": "Amandes",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf7upfh0ifqq",
+   "t": 1790235262781,
+   "type": "supprime",
+   "nom": "Barres céréales",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf7umad5yisx",
+   "t": 1790235258709,
+   "type": "supprime",
+   "nom": "Biscuits sablés",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf7uhkqpdfrd",
+   "t": 1790235252602,
+   "type": "supprime",
+   "nom": "Céréales petit-déjeuner",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf7ucblr15ob",
+   "t": 1790235245794,
+   "type": "supprime",
+   "nom": "Confiture",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf7u8td8v8bh",
+   "t": 1790235241249,
+   "type": "supprime",
+   "nom": "Gels caféinés",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf7u6zqskubg",
+   "t": 1790235238886,
+   "type": "supprime",
+   "nom": "Gels énergétiques",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf7u45sj5naf",
+   "t": 1790235235216,
+   "type": "supprime",
+   "nom": "Jus de fruits",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf7u1skregq3",
+   "t": 1790235232148,
+   "type": "supprime",
+   "nom": "Pâtes de fruits",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf7tnl5iomww",
+   "t": 1790235213737,
+   "type": "modifie",
+   "nom": "Galettes sans gluten",
+   "n": 0,
+   "apres": 1,
+   "ancien": "Abricots secs"
+  },
+  {
+   "id": "muf7t9dp6o44t",
+   "t": 1790235195325,
+   "type": "modifie",
+   "nom": "Pâte à tartiner",
+   "n": 0,
+   "apres": 0
+  },
+  {
+   "id": "muf7t7uj1l1ft",
+   "t": 1790235193339,
+   "type": "modifie",
+   "nom": "Confiture",
+   "n": 0,
+   "apres": 2
+  },
+  {
+   "id": "muf7t55oe4p3f",
+   "t": 1790235189852,
+   "type": "modifie",
+   "nom": "Beurres cacahuètes",
+   "n": 0,
+   "apres": 2
+  },
+  {
+   "id": "muf7syjjle1wo",
+   "t": 1790235181279,
+   "type": "modifie",
+   "nom": "Amandes",
+   "n": 0,
+   "apres": 7,
+   "ancien": "Compotes à boire"
+  },
+  {
+   "id": "muf7skk70oiwg",
+   "t": 1790235163159,
+   "type": "modifie",
+   "nom": "Flocons avoines",
+   "n": 0,
+   "apres": 8,
+   "ancien": "Clémentines"
+  },
+  {
+   "id": "muf7s3j2ynhto",
+   "t": 1790235141086,
+   "type": "modifie",
+   "nom": "Céréales crunchy",
+   "n": 0,
+   "apres": 3,
+   "ancien": "Barres chocolat-noisette"
+  },
+  {
+   "id": "muf7rjh9iy31b",
+   "t": 1790235115101,
+   "type": "modifie",
+   "nom": "Miel",
+   "n": 0,
+   "apres": 4
+  },
+  {
+   "id": "muf7rh248b8s7",
+   "t": 1790235111964,
+   "type": "pris",
+   "nom": "Miel",
+   "n": 1,
+   "apres": 4
+  },
+  {
+   "id": "muf7rfu6kauph",
+   "t": 1790235110382,
+   "type": "ajoute",
+   "nom": "Miel",
+   "n": 1,
+   "apres": 5
+  },
+  {
+   "id": "muf7rbh3eciii",
+   "t": 1790235104727,
+   "type": "modifie",
+   "nom": "Miel",
+   "n": 0,
+   "apres": 4,
+   "ancien": "Bananes"
+  },
+  {
+   "id": "muf7qxehts5er",
+   "t": 1790235086489,
+   "type": "modifie",
+   "nom": "Beurres cacahuètes",
+   "n": 0,
+   "apres": 2
+  },
+  {
+   "id": "muf7qm3lepsq8",
+   "t": 1790235071841,
+   "type": "modifie",
+   "nom": "Confiture",
+   "n": 0,
+   "apres": 2,
+   "ancien": "Lait d'amande"
+  },
+  {
+   "id": "muf7qa8pzmy8w",
+   "t": 1790235056473,
+   "type": "pris",
+   "nom": "Beurres cacahuètes",
+   "n": 1,
+   "apres": 2
+  },
+  {
+   "id": "muf7q8lcrp8kf",
+   "t": 1790235054336,
+   "type": "modifie",
+   "nom": "Beurres cacahuètes",
+   "n": 0,
+   "apres": 3,
+   "ancien": "Dattes"
+  },
+  {
+   "id": "mudyynmul82qs",
+   "t": 1790159864358,
+   "type": "pris",
+   "nom": "Chips",
+   "n": 1,
+   "apres": 0
+  },
+  {
+   "id": "mudyyhadt348d",
+   "t": 1790159856133,
+   "type": "ajoute",
+   "nom": "Chips",
+   "n": 1,
+   "apres": 1
+  },
+  {
+   "id": "mucwgp5y7mwpt",
+   "t": 1790095201126,
+   "type": "ajoute",
+   "nom": "Dattes",
+   "n": 1,
+   "apres": 3
+  }
+ ]
+}
