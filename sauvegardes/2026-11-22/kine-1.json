@@ -6,7 +6,7 @@
   "Soins",
   "Matériel"
  ],
- "maj": "2026-09-22T00:00:00.000Z",
+ "maj": "2026-09-24T07:14:51.182Z",
  "produits": [
   {
    "id": "p001",
@@ -48,7 +48,7 @@
    "id": "p005",
    "nom": "K-tape",
    "cat": "Strapping",
-   "qte": 6,
+   "qte": 3,
    "unite": "rouleaux",
    "date": "",
    "min": 2
@@ -57,7 +57,7 @@
    "id": "p006",
    "nom": "Sous-bande mousse",
    "cat": "Strapping",
-   "qte": 9,
+   "qte": 7,
    "unite": "rouleaux",
    "date": "",
    "min": 3
@@ -84,7 +84,7 @@
    "id": "p009",
    "nom": "Bande cohésive",
    "cat": "Strapping",
-   "qte": 0,
+   "qte": 2,
    "unite": "rouleaux",
    "date": "",
    "min": 3
@@ -252,5 +252,78 @@
    "min": 5
   }
  ],
- "journal": []
+ "journal": [
+  {
+   "id": "muf75kmdxts97",
+   "t": 1790234090149,
+   "type": "pris",
+   "nom": "Sous-bande mousse",
+   "n": 1,
+   "apres": 7
+  },
+  {
+   "id": "muf75j6hb2o8p",
+   "t": 1790234088446,
+   "type": "pris",
+   "nom": "Sous-bande mousse",
+   "n": 2,
+   "apres": 8
+  },
+  {
+   "id": "muf75iv9dudn4",
+   "t": 1790234087877,
+   "type": "ajoute",
+   "nom": "Sous-bande mousse",
+   "n": 1,
+   "apres": 10
+  },
+  {
+   "id": "mudz0whu3ullv",
+   "t": 1790159969154,
+   "type": "ajoute",
+   "nom": "Bande cohésive",
+   "n": 1,
+   "apres": 2
+  },
+  {
+   "id": "mudz0o5zqpqm0",
+   "t": 1790159958359,
+   "type": "ajoute",
+   "nom": "Bande cohésive",
+   "n": 1,
+   "apres": 1
+  },
+  {
+   "id": "mucwcr5tet6hh",
+   "t": 1790095018372,
+   "type": "pris",
+   "nom": "K-tape",
+   "n": 3,
+   "apres": 3
+  },
+  {
+   "id": "mucwcqgsrfaxz",
+   "t": 1790095016188,
+   "type": "ajoute",
+   "nom": "Ciseaux à bandes",
+   "n": 1,
+   "apres": 3
+  },
+  {
+   "id": "mucwcp2a5xtxj",
+   "t": 1790095015187,
+   "type": "pris",
+   "nom": "Ciseaux à bandes",
+   "n": 2,
+   "apres": 2
+  },
+  {
+   "id": "mucwcoailamuj",
+   "t": 1790095013370,
+   "type": "ajoute",
+   "nom": "Ciseaux à bandes",
+   "n": 1,
+   "apres": 4
+  }
+ ]
 }
